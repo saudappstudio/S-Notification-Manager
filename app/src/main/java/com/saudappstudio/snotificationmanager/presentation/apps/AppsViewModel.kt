@@ -1,4 +1,4 @@
-﻿package com.saudappstudio.snotificationmanager.presentation.apps
+package com.saudappstudio.snotificationmanager.presentation.apps
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -40,13 +40,17 @@ class AppsViewModel @Inject constructor(
     private val _userMessage = MutableStateFlow<String?>(null)
 
     val uiState: StateFlow<AppsUiState> = combine(
-        appRepository.getAllApps(),
-        firebaseProjectRepository.getAllProjects(),
-        topicRepository.getAllTopics(),
+        combine(
+            appRepository.getAllApps(),
+            firebaseProjectRepository.getAllProjects(),
+            topicRepository.getAllTopics()
+        ) { apps, projects, topics ->
+            Triple(apps, projects, topics)
+        },
         _searchQuery,
         _selectedApp,
         _userMessage
-    ) { apps, projects, topics, query, selected, message ->
+    ) { (apps, projects, topics), query, selected, message ->
         val filtered = if (query.isBlank()) {
             apps
         } else {
