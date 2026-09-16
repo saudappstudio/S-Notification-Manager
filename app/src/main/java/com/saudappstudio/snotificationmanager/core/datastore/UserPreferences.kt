@@ -1,11 +1,11 @@
-﻿package com.saudappstudio.snotificationmanager.core.datastore
+package com.saudappstudio.snotificationmanager.core.datastore
 
 /**
  * Data representation of stored application user preferences and security controls.
  */
 data class UserPreferences(
     val themeMode: String = "SYSTEM",
-    val backendUrl: String = "https://your-site.netlify.app/.netlify/functions",
+    val backendUrl: String = "https://saudnotificationmanager.netlify.app/.netlify/functions",
     val apiToken: String = "",
     val lastSelectedAppId: String = "",
     val testModeOnly: Boolean = false,

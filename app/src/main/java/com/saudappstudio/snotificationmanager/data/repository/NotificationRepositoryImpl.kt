@@ -1,4 +1,4 @@
-﻿package com.saudappstudio.snotificationmanager.data.repository
+package com.saudappstudio.snotificationmanager.data.repository
 
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -104,22 +104,28 @@ class NotificationRepositoryImpl(
             if (response.isSuccessful) {
                 val body = response.body()
                 if (body != null && body.success) {
-                    Result.success(body.messageId ?: "success")
+                    val msgId = body.messageId ?: "success"
+                    Logger.i("Notification Sent Successfully: messageId=$msgId")
+                    Result.success(msgId)
                 } else {
-                    Result.failure(Exception(body?.error ?: "Backend returned unsuccessful response"))
+                    val err = body?.error ?: "Backend returned unsuccessful response"
+                    Logger.e("Send Notification API Error: $err")
+                    Result.failure(Exception(err))
                 }
             } else {
+                val rawErrorBody = response.errorBody()?.string() ?: response.message()
                 val errorMsg = when (response.code()) {
-                    401 -> "Unauthorized: Check API authentication token in Settings"
-                    403 -> "Forbidden: You do not have permission to send this notification"
-                    404 -> "Not Found: Netlify function endpoint not found"
-                    500 -> "Internal Server Error: Backend Firebase Admin SDK execution failure"
-                    else -> "HTTP : "
+                    401 -> "Unauthorized (401): Check API authentication token in Settings"
+                    403 -> "Forbidden (403): You do not have permission to send this notification"
+                    404 -> "Not Found (404): Netlify function endpoint not found"
+                    500 -> "Internal Server Error (500): Firebase Admin execution failure - $rawErrorBody"
+                    else -> "HTTP ${response.code()}: $rawErrorBody"
                 }
+                Logger.e("Send Notification HTTP ${response.code()} Failure: $errorMsg")
                 Result.failure(Exception(errorMsg))
             }
         } catch (e: Exception) {
-            Logger.e("Send notification network error", e)
+            Logger.e("Send notification network exception: ${e.localizedMessage}", e)
             Result.failure(e)
         }
     }
@@ -129,12 +135,16 @@ class NotificationRepositoryImpl(
         return try {
             val response = apiService.sendTestNotification(dto)
             if (response.isSuccessful && response.body()?.success == true) {
-                Result.success(response.body()?.messageId ?: "test-success")
+                val msgId = response.body()?.messageId ?: "test-success"
+                Logger.i("Test Notification Sent Successfully: messageId=$msgId")
+                Result.success(msgId)
             } else {
-                Result.failure(Exception(response.body()?.error ?: "Test send failed (HTTP )"))
+                val rawError = response.errorBody()?.string() ?: response.body()?.error ?: "HTTP ${response.code()}"
+                Logger.e("Test Notification Failed: $rawError")
+                Result.failure(Exception(rawError))
             }
         } catch (e: Exception) {
-            Logger.e("Send test notification network error", e)
+            Logger.e("Send test notification network exception: ${e.localizedMessage}", e)
             Result.failure(e)
         }
     }

@@ -1,8 +1,9 @@
-﻿package com.saudappstudio.snotificationmanager.core.di
+package com.saudappstudio.snotificationmanager.core.di
 
 import android.content.Context
 import com.saudappstudio.snotificationmanager.BuildConfig
 import com.saudappstudio.snotificationmanager.core.datastore.PreferencesManager
+import com.saudappstudio.snotificationmanager.core.logging.Logger
 import com.saudappstudio.snotificationmanager.core.security.BiometricAuthManager
 import com.saudappstudio.snotificationmanager.data.remote.api.AuthInterceptor
 import com.saudappstudio.snotificationmanager.data.remote.api.NetlifyApiService
@@ -54,8 +55,10 @@ object NetworkModule {
             .addInterceptor(authInterceptor)
 
         if (BuildConfig.DEBUG) {
-            val logging = HttpLoggingInterceptor().apply {
-                level = HttpLoggingInterceptor.Level.BASIC
+            val logging = HttpLoggingInterceptor { message ->
+                Logger.d(message, "NetworkRequest")
+            }.apply {
+                level = HttpLoggingInterceptor.Level.BODY
             }
             builder.addInterceptor(logging)
         }

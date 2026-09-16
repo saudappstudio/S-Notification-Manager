@@ -200,7 +200,7 @@
     <string name="theme_light">Light</string>
     <string name="theme_dark">Dark</string>
     <string name="backend_url_title">Netlify Backend URL</string>
-    <string name="backend_url_hint">https://your-site.netlify.app/.netlify/functions</string>
+    <string name="backend_url_hint">https://saudnotificationmanager.netlify.app/.netlify/functions</string>
     <string name="api_token_title">API Authentication Token</string>
     <string name="api_token_hint">Bearer API Secret Token</string>
     <string name="api_status_title">Backend Status</string>

@@ -1,4 +1,4 @@
-﻿package com.saudappstudio.snotificationmanager.core.datastore
+package com.saudappstudio.snotificationmanager.core.datastore
 
 import android.content.Context
 import androidx.datastore.core.DataStore
@@ -51,7 +51,9 @@ class PreferencesManager(private val context: Context) {
         .map { preferences ->
             UserPreferences(
                 themeMode = preferences[PreferencesKeys.THEME_MODE] ?: "SYSTEM",
-                backendUrl = preferences[PreferencesKeys.BACKEND_URL] ?: "https://your-site.netlify.app/.netlify/functions",
+                backendUrl = preferences[PreferencesKeys.BACKEND_URL]?.takeIf { 
+                    it.isNotBlank() && !it.contains("your-site.netlify.app") 
+                } ?: "https://saudnotificationmanager.netlify.app/.netlify/functions",
                 apiToken = preferences[PreferencesKeys.API_TOKEN] ?: "",
                 lastSelectedAppId = preferences[PreferencesKeys.LAST_SELECTED_APP_ID] ?: "",
                 testModeOnly = preferences[PreferencesKeys.TEST_MODE_ONLY] ?: false,
