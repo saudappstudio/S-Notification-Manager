@@ -1,0 +1,9 @@
+﻿{
+  "name": "saud-notification-backend",
+  "version": "1.0.0",
+  "description": "Serverless Netlify Functions proxying FCM push notifications via Firebase Admin SDK",
+  "main": "functions/send-notification.js",
+  "dependencies": {
+    "firebase-admin": "^12.0.0"
+  }
+}

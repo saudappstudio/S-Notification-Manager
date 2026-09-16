@@ -1,0 +1,263 @@
+<resources>
+    <!-- App & Brand -->
+    <string name="app_name">Saud Notification Manager</string>
+    <string name="app_short_description">Private FCM Notification Control Center</string>
+    <string name="app_version_label">Version 1.0 (Build 100)</string>
+    <string name="app_internal_admin_notice">Private internal administrator application. For personal multi-app push orchestration.</string>
+
+    <!-- Navigation Bar Labels -->
+    <string name="nav_home">Home</string>
+    <string name="nav_apps">Apps</string>
+    <string name="nav_templates">Templates</string>
+    <string name="nav_history">History</string>
+    <string name="nav_settings">Settings</string>
+
+    <!-- Common Actions & Buttons -->
+    <string name="btn_save">Save</string>
+    <string name="btn_cancel">Cancel</string>
+    <string name="btn_delete">Delete</string>
+    <string name="btn_edit">Edit</string>
+    <string name="btn_continue">Continue</string>
+    <string name="btn_retry">Retry</string>
+    <string name="btn_send_now">Send Now</string>
+    <string name="btn_send_notification">Send Notification</string>
+    <string name="btn_send_test">Send Test</string>
+    <string name="btn_view_all">View all</string>
+    <string name="btn_view_history">View history</string>
+    <string name="btn_use_template">Use Template</string>
+    <string name="btn_duplicate">Duplicate</string>
+    <string name="btn_save_as_template">Save as Template</string>
+    <string name="btn_send_again">Send Again</string>
+    <string name="btn_add_app">Add Application</string>
+    <string name="btn_add_firebase_project">Add Firebase Project</string>
+    <string name="btn_add_topic">Add Topic</string>
+    <string name="btn_create_template">Create Template</string>
+    <string name="btn_test_connection">Test Connection</string>
+    <string name="btn_refresh">Refresh</string>
+    <string name="btn_copy">Copy</string>
+    <string name="btn_paste">Paste</string>
+    <string name="btn_add_data_row">Add Data Key/Value</string>
+    <string name="btn_save_and_send">Save &amp; Send</string>
+    <string name="btn_validate_config">Validate Configuration</string>
+    <string name="btn_export_config">Export Configuration</string>
+    <string name="btn_import_config">Import Configuration</string>
+    <string name="btn_clear_history">Clear Notification History</string>
+    <string name="btn_reset_settings">Reset Local Settings</string>
+
+    <!-- Home Screen -->
+    <string name="home_title">Notification Manager</string>
+    <string name="home_greeting">Notification Center</string>
+    <string name="home_subtitle">Manage notifications across your apps</string>
+    <string name="home_backend_status_title">Netlify Backend</string>
+    <string name="home_backend_connected">Connected</string>
+    <string name="home_backend_disconnected">Disconnected</string>
+    <string name="home_backend_checking">Checking…</string>
+    <string name="home_backend_last_checked">Last checked: %1$s</string>
+    <string name="home_quick_actions_title">Quick Actions</string>
+    <string name="home_your_apps_title">Your Apps</string>
+    <string name="home_recent_notifications_title">Recent Notifications</string>
+    <string name="home_qa_send_title">Send Notification</string>
+    <string name="home_qa_send_desc">Send a push now</string>
+    <string name="home_qa_templates_title">Templates</string>
+    <string name="home_qa_templates_desc">Reusable messages</string>
+    <string name="home_qa_apps_title">Apps</string>
+    <string name="home_qa_apps_desc">Manage your apps</string>
+    <string name="home_qa_history_title">History</string>
+    <string name="home_qa_history_desc">View sent notifications</string>
+
+    <!-- Apps Screen -->
+    <string name="apps_title">My Apps</string>
+    <string name="apps_subtitle">Manage your connected applications</string>
+    <string name="apps_search_placeholder">Search apps by name, package or project…</string>
+    <string name="apps_manage_firebase_projects">Manage Firebase Projects</string>
+    <string name="apps_manage_topics">Manage Audience Topics</string>
+
+    <!-- Add / Edit App Screen -->
+    <string name="add_app_title">Add Application</string>
+    <string name="edit_app_title">Edit Application</string>
+    <string name="app_details_title">Application Details</string>
+    <string name="field_app_name">App Name</string>
+    <string name="field_package_name">Package Name</string>
+    <string name="field_app_id">App Identifier</string>
+    <string name="field_firebase_project">Firebase Project</string>
+    <string name="field_default_topic">Default Topic</string>
+    <string name="field_environment">Environment</string>
+    <string name="field_description">Description</string>
+    <string name="section_default_behavior">Default Notification Behavior</string>
+    <string name="pref_allow_push">Allow push notifications</string>
+    <string name="pref_allow_topic">Allow topic notifications</string>
+    <string name="pref_allow_token">Allow token notifications</string>
+    <string name="pref_allow_image">Allow image notifications</string>
+    <string name="pref_allow_deep_links">Allow deep links</string>
+    <string name="section_targeting">Targeting Capabilities</string>
+    <string name="section_app_controls">Application Safety Controls</string>
+    <string name="pref_enable_notifications">Enable notifications for this app</string>
+    <string name="pref_enable_test_mode">Enable test mode</string>
+    <string name="pref_allow_production_sends">Allow production sends</string>
+    <string name="pref_require_confirm_prod">Require confirmation before production send</string>
+
+    <!-- Firebase Projects Screen -->
+    <string name="firebase_projects_title">Firebase Projects</string>
+    <string name="firebase_projects_subtitle">Configure multi-project serverless backend mappings</string>
+    <string name="add_firebase_project_title">Add Firebase Project</string>
+    <string name="field_project_display_name">Project Display Name</string>
+    <string name="field_project_identifier">Project Identifier</string>
+    <string name="field_backend_config_key">Backend Configuration Key</string>
+    <string name="firebase_security_notice">Firebase credentials are configured securely on the Netlify backend. Private keys never touch this device.</string>
+    <string name="firebase_key_hint">e.g. dictionary, vocabulary, calculator</string>
+
+    <!-- Topics Screen -->
+    <string name="topics_title">Topics</string>
+    <string name="topics_subtitle">Manage notification audiences</string>
+    <string name="add_topic_title">Add Topic</string>
+    <string name="edit_topic_title">Edit Topic</string>
+    <string name="field_topic_name">Topic Name</string>
+    <string name="field_topic_description">Description</string>
+    <string name="field_associated_app">Associated Application</string>
+    <string name="topic_validation_error">Topic name must be alphanumeric with underscores or dashes</string>
+
+    <!-- Send Notification Screen -->
+    <string name="send_title">Send Notification</string>
+    <string name="send_step_app">1. Application</string>
+    <string name="send_step_audience">2. Audience</string>
+    <string name="send_step_content">3. Content</string>
+    <string name="send_step_action">4. Action &amp; Deep Link</string>
+    <string name="send_step_advanced">5. Advanced Options</string>
+    <string name="send_step_preview">6. Notification Preview</string>
+    <string name="target_type_topic">Topic Audience</string>
+    <string name="target_type_token">Device Token</string>
+    <string name="field_select_app">Select Application</string>
+    <string name="field_select_topic">Select Topic</string>
+    <string name="field_device_token">FCM Registration Token</string>
+    <string name="field_notification_title">Notification Title</string>
+    <string name="field_notification_message">Message Content</string>
+    <string name="field_image_url">Image URL (Optional)</string>
+    <string name="field_sound">Notification Sound</string>
+    <string name="field_sound_default">Default</string>
+    <string name="field_tap_action">On Tap Action</string>
+    <string name="field_deep_link">Deep Link URI</string>
+    <string name="field_channel_id">Notification Channel ID</string>
+    <string name="field_priority">Priority</string>
+    <string name="field_ttl">TTL (Time to Live in seconds)</string>
+    <string name="field_collapse_key">Collapse Key</string>
+    <string name="field_badge">App Badge Count</string>
+    <string name="field_custom_data">Custom Key / Value Data</string>
+    <string name="char_count_format">%1$d / %2$d characters</string>
+    <string name="image_preview_error">Image URL could not be loaded preview.</string>
+
+    <!-- Tap Actions -->
+    <string name="action_open_app">Open App</string>
+    <string name="action_open_deep_link">Open Deep Link</string>
+    <string name="action_open_url">Open Web URL</string>
+    <string name="action_none">No Action</string>
+
+    <!-- Priorities -->
+    <string name="priority_high">High (Immediate)</string>
+    <string name="priority_normal">Normal (Power-efficient)</string>
+
+    <!-- Template Manager -->
+    <string name="templates_title">Templates</string>
+    <string name="templates_subtitle">Save messages you send often</string>
+    <string name="templates_search_placeholder">Search templates…</string>
+    <string name="create_template_title">Create Template</string>
+    <string name="edit_template_title">Edit Template</string>
+    <string name="field_template_name">Template Name</string>
+    <string name="filter_all">All</string>
+    <string name="filter_favorites">Favorites</string>
+    <string name="filter_by_app">By App</string>
+    <string name="available_variables_header">Insert Dynamic Variables</string>
+
+    <!-- History Screen -->
+    <string name="history_title">History</string>
+    <string name="history_subtitle">Notifications you’ve sent</string>
+    <string name="history_search_placeholder">Search notification history…</string>
+    <string name="filter_sent">Sent</string>
+    <string name="filter_failed">Failed</string>
+    <string name="filter_testing">Testing</string>
+    <string name="filter_production">Production</string>
+    <string name="history_details_title">Notification Details</string>
+    <string name="detail_app">Application</string>
+    <string name="detail_project">Firebase Project</string>
+    <string name="detail_environment">Environment</string>
+    <string name="detail_target">Target Audience</string>
+    <string name="detail_sent_time">Sent Time</string>
+    <string name="detail_status">Status</string>
+    <string name="detail_message_id">FCM Message ID</string>
+    <string name="detail_error">Failure Reason</string>
+    <string name="detail_payload">Dispatched Payload</string>
+
+    <!-- Settings Screen -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_section_appearance">Appearance</string>
+    <string name="settings_section_backend">Backend &amp; API</string>
+    <string name="settings_section_notifications">Default Notification Behaviors</string>
+    <string name="settings_section_safety">Safety &amp; Production Controls</string>
+    <string name="settings_section_security">Security &amp; Biometrics</string>
+    <string name="settings_section_data">Data Management</string>
+    <string name="settings_section_about">About</string>
+    <string name="pref_theme_title">Theme</string>
+    <string name="theme_system">System Default</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_dark">Dark</string>
+    <string name="backend_url_title">Netlify Backend URL</string>
+    <string name="backend_url_hint">https://your-site.netlify.app/.netlify/functions</string>
+    <string name="api_token_title">API Authentication Token</string>
+    <string name="api_token_hint">Bearer API Secret Token</string>
+    <string name="api_status_title">Backend Status</string>
+    <string name="biometric_lock_title">Biometric Lock</string>
+    <string name="biometric_lock_desc">Require fingerprint / face auth before viewing API keys or sending to Production</string>
+    <string name="pref_test_mode_only">Test Mode Only</string>
+    <string name="pref_test_mode_only_desc">Strictly disable all production sends across the application</string>
+    <string name="test_mode_banner_text">TEST MODE ENABLED — Production sending is blocked</string>
+
+    <!-- Dialogs & Confirmations -->
+    <string name="dialog_confirm_production_title">Confirm Production Send</string>
+    <string name="dialog_confirm_production_msg">You are about to dispatch a live push notification to real production users. This action cannot be revoked.</string>
+    <string name="dialog_delete_title">Confirm Deletion</string>
+    <string name="dialog_delete_msg">Are you sure you want to delete \"%1$s\"? This cannot be undone.</string>
+    <string name="dialog_clear_history_title">Clear History</string>
+    <string name="dialog_clear_history_msg">All stored notification send logs will be deleted permanently.</string>
+    <string name="dialog_reset_settings_title">Reset Local Settings</string>
+    <string name="dialog_reset_settings_msg">Reset backend URL, API credentials, and safety preferences to defaults?</string>
+
+    <!-- Biometric Prompts -->
+    <string name="biometric_prompt_title">Authenticate to Proceed</string>
+    <string name="biometric_prompt_subtitle">Verify your identity for sensitive administrative actions</string>
+    <string name="biometric_negative_btn">Cancel</string>
+
+    <!-- Empty States -->
+    <string name="empty_apps_title">No apps yet</string>
+    <string name="empty_apps_desc">Add your first application to start orchestrating push notifications.</string>
+    <string name="empty_templates_title">No templates yet</string>
+    <string name="empty_templates_desc">Save frequently sent messages to quickly dispatch them anytime.</string>
+    <string name="empty_history_title">No notifications sent yet</string>
+    <string name="empty_history_desc">Dispatched notifications and delivery responses will appear here.</string>
+    <string name="empty_topics_title">No topics configured</string>
+    <string name="empty_topics_desc">Define audience topics for your apps to segment your notification dispatch.</string>
+    <string name="empty_projects_title">No Firebase projects</string>
+    <string name="empty_projects_desc">Configure project identifiers mapped to Netlify serverless functions.</string>
+
+    <!-- Status Labels -->
+    <string name="status_sent">✓ Sent</string>
+    <string name="status_failed">✕ Failed</string>
+    <string name="status_pending">● Pending</string>
+    <string name="status_production">PRODUCTION</string>
+    <string name="status_testing">TESTING</string>
+    <string name="status_development">DEVELOPMENT</string>
+
+    <!-- Feedback & Messages -->
+    <string name="msg_notification_sent_success">Notification dispatched successfully!</string>
+    <string name="msg_notification_send_failed">Failed to send notification: %1$s</string>
+    <string name="msg_copied_to_clipboard">Copied to clipboard</string>
+    <string name="msg_connection_success">Backend connection verified! API v%1$s</string>
+    <string name="msg_connection_failed">Could not connect to Netlify backend: %1$s</string>
+    <string name="msg_config_exported">Configuration exported to clipboard</string>
+    <string name="msg_config_imported">Configuration imported successfully</string>
+    <string name="msg_history_cleared">Notification history cleared</string>
+    <string name="msg_settings_reset">Settings restored to default</string>
+    <string name="msg_item_saved">Saved successfully</string>
+    <string name="msg_item_deleted">Deleted successfully</string>
+    <string name="msg_offline_blocked">Device is offline. An active network connection is required to send pushes.</string>
+    <string name="msg_production_blocked_by_test_mode">Production dispatch blocked: Test Mode Only is currently active in Safety Controls.</string>
+    <string name="msg_validation_missing_fields">Please fill in all required fields before proceeding.</string>
+</resources>

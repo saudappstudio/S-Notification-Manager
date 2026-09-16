@@ -1,0 +1,435 @@
+﻿package com.saudappstudio.snotificationmanager.presentation.settings
+
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Fingerprint
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedCard
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import com.saudappstudio.snotificationmanager.R
+import com.saudappstudio.snotificationmanager.core.ui.ToastManager
+import com.saudappstudio.snotificationmanager.presentation.components.SNotificationConfirmDialog
+import com.saudappstudio.snotificationmanager.presentation.components.SNotificationDialog
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SettingsScreen(
+    viewModel: SettingsViewModel
+) {
+    val state by viewModel.uiState.collectAsState()
+    val context = LocalContext.current
+    val prefs = state.userPreferences
+
+    var backendUrlInput by remember(prefs.backendUrl) { mutableStateOf(prefs.backendUrl) }
+    var apiTokenInput by remember(prefs.apiToken) { mutableStateOf(prefs.apiToken) }
+
+    var showClearConfirm by remember { mutableStateOf(false) }
+    var showResetConfirm by remember { mutableStateOf(false) }
+    var showImportDialog by remember { mutableStateOf(false) }
+    var importJsonInput by remember { mutableStateOf("") }
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text(stringResource(R.string.settings_title)) },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surface
+                )
+            )
+        }
+    ) { paddingValues ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .padding(horizontal = 16.dp)
+                .verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            Spacer(modifier = Modifier.height(4.dp))
+
+            // SECTION 1: APPEARANCE
+            SectionCard(title = stringResource(R.string.settings_section_appearance)) {
+                Text(
+                    text = stringResource(R.string.pref_theme_title),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    FilterChip(
+                        selected = prefs.themeMode == "SYSTEM",
+                        onClick = { viewModel.setThemeMode("SYSTEM") },
+                        label = { Text(stringResource(R.string.theme_system)) },
+                        shape = RoundedCornerShape(8.dp),
+                        modifier = Modifier.weight(1f)
+                    )
+                    FilterChip(
+                        selected = prefs.themeMode == "LIGHT",
+                        onClick = { viewModel.setThemeMode("LIGHT") },
+                        label = { Text(stringResource(R.string.theme_light)) },
+                        shape = RoundedCornerShape(8.dp),
+                        modifier = Modifier.weight(1f)
+                    )
+                    FilterChip(
+                        selected = prefs.themeMode == "DARK",
+                        onClick = { viewModel.setThemeMode("DARK") },
+                        label = { Text(stringResource(R.string.theme_dark)) },
+                        shape = RoundedCornerShape(8.dp),
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+            }
+
+            // SECTION 2: BACKEND & API CONFIGURATION
+            SectionCard(title = stringResource(R.string.settings_section_backend)) {
+                OutlinedTextField(
+                    value = backendUrlInput,
+                    onValueChange = {
+                        backendUrlInput = it
+                        viewModel.setBackendUrl(it)
+                    },
+                    label = { Text(stringResource(R.string.backend_url_title)) },
+                    placeholder = { Text(stringResource(R.string.backend_url_hint)) },
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true,
+                    shape = RoundedCornerShape(12.dp)
+                )
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                OutlinedTextField(
+                    value = apiTokenInput,
+                    onValueChange = {
+                        apiTokenInput = it
+                        viewModel.setApiToken(it)
+                    },
+                    label = { Text(stringResource(R.string.api_token_title)) },
+                    placeholder = { Text(stringResource(R.string.api_token_hint)) },
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true,
+                    shape = RoundedCornerShape(12.dp)
+                )
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Button(
+                        onClick = { viewModel.testBackendConnection() },
+                        enabled = !state.isTestingConnection,
+                        shape = RoundedCornerShape(10.dp)
+                    ) {
+                        if (state.isTestingConnection) {
+                            CircularProgressIndicator(modifier = Modifier.size(16.dp), strokeWidth = 2.dp)
+                            Spacer(modifier = Modifier.width(6.dp))
+                        }
+                        Text(stringResource(R.string.btn_test_connection))
+                    }
+
+                    state.connectionResult?.let { msg ->
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                imageVector = if (state.isConnectionSuccess) Icons.Default.Check else Icons.Default.Close,
+                                contentDescription = null,
+                                tint = if (state.isConnectionSuccess) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
+                                modifier = Modifier.size(16.dp)
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(
+                                text = msg,
+                                style = MaterialTheme.typography.labelSmall,
+                                color = if (state.isConnectionSuccess) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
+                            )
+                        }
+                    }
+                }
+            }
+
+            // SECTION 3: SAFETY & PRODUCTION CONTROLS
+            SectionCard(title = stringResource(R.string.settings_section_safety)) {
+                SettingsSwitchRow(
+                    title = stringResource(R.string.pref_test_mode_only),
+                    subtitle = stringResource(R.string.pref_test_mode_only_desc),
+                    checked = prefs.testModeOnly,
+                    onCheckedChange = { viewModel.setTestModeOnly(it) }
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                SettingsSwitchRow(
+                    title = stringResource(R.string.pref_require_confirm_prod),
+                    subtitle = "Always show confirmation modal before sending to production",
+                    checked = prefs.confirmBeforeProdSend,
+                    onCheckedChange = { viewModel.setConfirmBeforeProdSend(it) }
+                )
+            }
+
+            // SECTION 4: SECURITY & BIOMETRICS
+            SectionCard(title = stringResource(R.string.settings_section_security)) {
+                SettingsSwitchRow(
+                    title = stringResource(R.string.biometric_lock_title),
+                    subtitle = stringResource(R.string.biometric_lock_desc),
+                    checked = prefs.requireBiometricForProd,
+                    onCheckedChange = { viewModel.setRequireBiometricForProd(it) }
+                )
+            }
+
+            // SECTION 5: DATA MANAGEMENT
+            SectionCard(title = stringResource(R.string.settings_section_data)) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    OutlinedButton(
+                        onClick = {
+                            viewModel.exportConfiguration { json ->
+                                val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                                val clip = ClipData.newPlainText("Saud Notification Manager Backup", json)
+                                clipboard.setPrimaryClip(clip)
+                                ToastManager.show(context, R.string.msg_config_exported)
+                            }
+                        },
+                        modifier = Modifier.weight(1f),
+                        shape = RoundedCornerShape(10.dp)
+                    ) {
+                        Text(stringResource(R.string.btn_export_config))
+                    }
+
+                    OutlinedButton(
+                        onClick = { showImportDialog = true },
+                        modifier = Modifier.weight(1f),
+                        shape = RoundedCornerShape(10.dp)
+                    ) {
+                        Text(stringResource(R.string.btn_import_config))
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    OutlinedButton(
+                        onClick = { showClearConfirm = true },
+                        modifier = Modifier.weight(1f),
+                        shape = RoundedCornerShape(10.dp)
+                    ) {
+                        Text(stringResource(R.string.btn_clear_history))
+                    }
+
+                    OutlinedButton(
+                        onClick = { showResetConfirm = true },
+                        modifier = Modifier.weight(1f),
+                        shape = RoundedCornerShape(10.dp)
+                    ) {
+                        Text(stringResource(R.string.btn_reset_settings))
+                    }
+                }
+            }
+
+            // SECTION 6: ABOUT
+            SectionCard(title = stringResource(R.string.settings_section_about)) {
+                Text(
+                    text = stringResource(R.string.app_name),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Spacer(modifier = Modifier.height(2.dp))
+                Text(
+                    text = stringResource(R.string.app_version_label),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = stringResource(R.string.app_internal_admin_notice),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+
+            Spacer(modifier = Modifier.height(32.dp))
+        }
+    }
+
+    // Dialogs
+    if (showClearConfirm) {
+        SNotificationConfirmDialog(
+            title = stringResource(R.string.dialog_clear_history_title),
+            message = stringResource(R.string.dialog_clear_history_msg),
+            isDestructive = true,
+            confirmText = stringResource(R.string.btn_delete),
+            onConfirm = {
+                viewModel.clearAllHistory {
+                    ToastManager.show(context, R.string.msg_history_cleared)
+                    showClearConfirm = false
+                }
+            },
+            onDismiss = { showClearConfirm = false }
+        )
+    }
+
+    if (showResetConfirm) {
+        SNotificationConfirmDialog(
+            title = stringResource(R.string.dialog_reset_settings_title),
+            message = stringResource(R.string.dialog_reset_settings_msg),
+            isDestructive = true,
+            confirmText = stringResource(R.string.btn_continue),
+            onConfirm = {
+                viewModel.resetSettings {
+                    ToastManager.show(context, R.string.msg_settings_reset)
+                    showResetConfirm = false
+                }
+            },
+            onDismiss = { showResetConfirm = false }
+        )
+    }
+
+    if (showImportDialog) {
+        SNotificationDialog(
+            title = stringResource(R.string.btn_import_config),
+            onDismissRequest = { showImportDialog = false },
+            confirmText = stringResource(R.string.btn_continue),
+            onConfirm = {
+                viewModel.importConfiguration(importJsonInput) { success ->
+                    if (success) {
+                        ToastManager.show(context, R.string.msg_config_imported)
+                        showImportDialog = false
+                    } else {
+                        ToastManager.show(context, "Failed to import JSON data")
+                    }
+                }
+            }
+        ) {
+            Column {
+                Text(
+                    text = "Paste your exported JSON configuration below:",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                OutlinedTextField(
+                    value = importJsonInput,
+                    onValueChange = { importJsonInput = it },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(150.dp),
+                    placeholder = { Text("{ ... }") },
+                    shape = RoundedCornerShape(10.dp)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun SectionCard(
+    title: String,
+    content: @Composable () -> Unit
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary
+            )
+            Spacer(modifier = Modifier.height(12.dp))
+            content()
+        }
+    }
+}
+
+@Composable
+private fun SettingsSwitchRow(
+    title: String,
+    subtitle: String,
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            Text(
+                text = subtitle,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+        Spacer(modifier = Modifier.width(12.dp))
+        Switch(
+            checked = checked,
+            onCheckedChange = onCheckedChange
+        )
+    }
+}
