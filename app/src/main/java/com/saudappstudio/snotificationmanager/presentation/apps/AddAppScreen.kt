@@ -1,4 +1,4 @@
-﻿package com.saudappstudio.snotificationmanager.presentation.apps
+package com.saudappstudio.snotificationmanager.presentation.apps
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -47,20 +47,24 @@ import com.saudappstudio.snotificationmanager.domain.model.Environment
 import com.saudappstudio.snotificationmanager.provider.EnvironmentOptionsProvider
 import java.util.UUID
 
+import androidx.compose.runtime.LaunchedEffect
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddAppScreen(
+    initialAppId: String = "",
     viewModel: AppsViewModel,
     onNavigateBack: () -> Unit
 ) {
     val state by viewModel.uiState.collectAsState()
     val context = LocalContext.current
 
+    var existingAppId by remember { mutableStateOf<String?>(null) }
     var appName by remember { mutableStateOf("") }
     var packageName by remember { mutableStateOf("") }
     var appId by remember { mutableStateOf("") }
     var selectedProjectId by remember { mutableStateOf(state.projects.firstOrNull()?.id ?: "") }
-    var defaultTopic by remember { mutableStateOf("") }
+    var defaultTopic by remember { mutableStateOf("global") }
     var selectedEnv by remember { mutableStateOf(Environment.PRODUCTION) }
     var description by remember { mutableStateOf("") }
 
@@ -73,10 +77,33 @@ fun AddAppScreen(
     var projectDropdownExpanded by remember { mutableStateOf(false) }
     var envDropdownExpanded by remember { mutableStateOf(false) }
 
+    LaunchedEffect(initialAppId, state.apps) {
+        if (initialAppId.isNotBlank()) {
+            val app = state.apps.find { it.id == initialAppId }
+            if (app != null) {
+                existingAppId = app.id
+                appName = app.name
+                packageName = app.packageName
+                appId = app.appId
+                selectedProjectId = app.firebaseProjectId
+                defaultTopic = app.defaultTopic
+                selectedEnv = app.environment
+                description = app.description
+                allowPush = app.allowPush
+                allowTopic = app.allowTopic
+                allowToken = app.allowToken
+                allowImage = app.allowImage
+                allowDeepLinks = app.allowDeepLinks
+            }
+        }
+    }
+
+    val isEditing = initialAppId.isNotBlank()
+
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(R.string.add_app_title)) },
+                title = { Text(stringResource(if (isEditing) R.string.edit_app_title else R.string.add_app_title)) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(
@@ -251,7 +278,7 @@ fun AddAppScreen(
                             return@Button
                         }
                         val newApp = AppModel(
-                            id = UUID.randomUUID().toString(),
+                            id = existingAppId ?: UUID.randomUUID().toString(),
                             name = appName.trim(),
                             packageName = packageName.trim(),
                             appId = appId.ifBlank { "app_${System.currentTimeMillis()}" },

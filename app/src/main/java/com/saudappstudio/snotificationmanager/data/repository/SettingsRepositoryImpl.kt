@@ -62,6 +62,10 @@ class SettingsRepositoryImpl(
         preferencesManager.setRequireBiometricForProd(required)
     }
 
+    override suspend fun setRequireBiometricOnAppOpen(required: Boolean) {
+        preferencesManager.setRequireBiometricOnAppOpen(required)
+    }
+
     override suspend fun setDefaultNotificationSettings(channelId: String, priority: String) {
         preferencesManager.setDefaultNotificationSettings(channelId, priority)
     }
@@ -78,7 +82,7 @@ class SettingsRepositoryImpl(
                     message = body?.status ?: "OK"
                 )
                 preferencesManager.setBackendHealthStatus(model.timestamp, "CONNECTED")
-                Logger.i("Backend Connected Successfully: status=${body?.status}, service=${body?.service}")
+                Logger.i("Backend Connected Successfully: status=${body?.status}, version=${body?.version}")
                 Result.success(model)
             } else {
                 val errorMsg = response.errorBody()?.string() ?: response.message()

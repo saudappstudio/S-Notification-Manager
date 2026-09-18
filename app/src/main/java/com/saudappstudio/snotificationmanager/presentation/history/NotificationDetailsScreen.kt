@@ -1,4 +1,4 @@
-﻿package com.saudappstudio.snotificationmanager.presentation.history
+package com.saudappstudio.snotificationmanager.presentation.history
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -36,6 +38,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.saudappstudio.snotificationmanager.R
 import com.saudappstudio.snotificationmanager.core.ui.ToastManager
@@ -64,7 +67,13 @@ fun NotificationDetailsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(R.string.history_details_title)) },
+                title = {
+                    Text(
+                        text = stringResource(R.string.history_details_title),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
@@ -84,7 +93,11 @@ fun NotificationDetailsScreen(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(text = "Loading notification details...")
+                Text(
+                    text = "Loading notification details...",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             }
             return@Scaffold
         }
@@ -136,9 +149,19 @@ fun NotificationDetailsScreen(
             ) {
                 Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     DetailRow(label = stringResource(R.string.detail_app), value = item.appName)
+
+                    val typeLabel = if (item.notificationType == "IN_APP") "In-App Messaging" else "Standard Push"
+                    DetailRow(label = stringResource(R.string.detail_notification_type), value = typeLabel)
+
+                    if (item.eventTrigger.isNotBlank()) {
+                        DetailRow(label = stringResource(R.string.detail_event_trigger), value = item.eventTrigger)
+                    }
+
                     DetailRow(label = stringResource(R.string.detail_target), value = "${item.targetType.key}: ${item.target}")
+
                     val timeFormatted = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date(item.sentAt))
-                    DetailRow(label = stringResource(R.string.detail_sent_time), value = timeFormatted)
+                    val timeLabel = if (item.isScheduled) stringResource(R.string.detail_scheduled_time) else stringResource(R.string.detail_sent_time)
+                    DetailRow(label = timeLabel, value = timeFormatted)
 
                     item.messageId?.let { id ->
                         DetailRow(label = stringResource(R.string.detail_message_id), value = id)
@@ -151,38 +174,52 @@ fun NotificationDetailsScreen(
                     if (item.deepLink.isNotBlank()) {
                         DetailRow(label = "Deep Link", value = item.deepLink)
                     }
+
+                    if (item.customData.isNotEmpty()) {
+                        DetailRow(label = stringResource(R.string.detail_payload), value = item.customData.entries.joinToString(", ") { "${it.key}: ${it.value}" })
+                    }
                 }
             }
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Action Buttons: Send Again & Save as Template
-            Row(
+            // Action Buttons: Stacked vertically with full width to guarantee single-line text
+            Column(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(10.dp)
+                verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
+                Button(
+                    onClick = { onSendAgain(item.appId, item.id) },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Icon(Icons.Default.Send, contentDescription = null, modifier = Modifier.size(18.dp))
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = stringResource(R.string.btn_send_again),
+                        maxLines = 1,
+                        softWrap = false,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+
                 OutlinedButton(
                     onClick = {
                         viewModel.saveHistoryAsTemplate(item) {
                             ToastManager.show(context, R.string.msg_item_saved)
                         }
                     },
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp)
                 ) {
-                    Icon(Icons.Default.BookmarkBorder, contentDescription = null)
-                    Spacer(modifier = Modifier.padding(horizontal = 2.dp))
-                    Text(stringResource(R.string.btn_save_as_template))
-                }
-
-                Button(
-                    onClick = { onSendAgain(item.appId, item.id) },
-                    modifier = Modifier.weight(1f),
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    Icon(Icons.Default.Send, contentDescription = null)
-                    Spacer(modifier = Modifier.padding(horizontal = 2.dp))
-                    Text(stringResource(R.string.btn_send_again))
+                    Icon(Icons.Default.BookmarkBorder, contentDescription = null, modifier = Modifier.size(18.dp))
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = stringResource(R.string.btn_save_as_template),
+                        maxLines = 1,
+                        softWrap = false,
+                        overflow = TextOverflow.Ellipsis
+                    )
                 }
             }
 

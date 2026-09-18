@@ -11,6 +11,7 @@ data class UserPreferences(
     val testModeOnly: Boolean = false,
     val confirmBeforeProdSend: Boolean = true,
     val requireBiometricForProd: Boolean = false,
+    val requireBiometricOnAppOpen: Boolean = false,
     val defaultPriority: String = "HIGH",
     val defaultChannelId: String = "general_notifications",
     val lastCheckedTimestamp: Long = 0L,

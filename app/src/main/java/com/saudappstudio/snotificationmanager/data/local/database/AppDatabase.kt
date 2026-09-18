@@ -1,4 +1,4 @@
-﻿package com.saudappstudio.snotificationmanager.data.local.database
+package com.saudappstudio.snotificationmanager.data.local.database
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
@@ -25,7 +25,7 @@ import com.saudappstudio.snotificationmanager.data.local.entities.TopicEntity
         TemplateEntity::class,
         NotificationHistoryEntity::class
     ],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 @TypeConverters(Converters::class)

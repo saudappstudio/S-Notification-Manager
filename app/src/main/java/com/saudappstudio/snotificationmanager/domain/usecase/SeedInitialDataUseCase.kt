@@ -1,4 +1,4 @@
-﻿package com.saudappstudio.snotificationmanager.domain.usecase
+package com.saudappstudio.snotificationmanager.domain.usecase
 
 import com.google.gson.Gson
 import com.saudappstudio.snotificationmanager.core.logging.Logger
@@ -65,6 +65,10 @@ class SeedInitialDataUseCase(
                     imageUrl = hist.imageUrl,
                     clickAction = hist.clickAction,
                     deepLink = hist.deepLink,
+                    notificationType = hist.notificationType,
+                    eventTrigger = hist.eventTrigger,
+                    isScheduled = hist.isScheduled,
+                    scheduledTimestamp = hist.scheduledTimestamp,
                     customDataJson = gson.toJson(hist.customData),
                     sentAt = hist.sentAt
                 )

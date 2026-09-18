@@ -1,7 +1,7 @@
-﻿package com.saudappstudio.snotificationmanager.domain.model
+package com.saudappstudio.snotificationmanager.domain.model
 
 /**
- * Domain model representing a dispatched push notification history record.
+ * Domain model representing a dispatched push or in-app notification history record.
  */
 data class NotificationHistoryModel(
     val id: String,
@@ -18,6 +18,10 @@ data class NotificationHistoryModel(
     val imageUrl: String = "",
     val clickAction: String = "OPEN_APP",
     val deepLink: String = "",
+    val notificationType: String = "PUSH",
+    val eventTrigger: String = "",
+    val isScheduled: Boolean = false,
+    val scheduledTimestamp: Long? = null,
     val customData: Map<String, String> = emptyMap(),
     val sentAt: Long = System.currentTimeMillis()
 )

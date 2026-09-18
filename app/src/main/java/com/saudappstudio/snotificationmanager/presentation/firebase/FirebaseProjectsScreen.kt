@@ -1,6 +1,7 @@
-﻿package com.saudappstudio.snotificationmanager.presentation.firebase
+package com.saudappstudio.snotificationmanager.presentation.firebase
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,8 +20,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.CloudQueue
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -42,12 +46,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.saudappstudio.snotificationmanager.R
 import com.saudappstudio.snotificationmanager.domain.model.FirebaseProjectModel
 import com.saudappstudio.snotificationmanager.presentation.components.EmptyStateView
 import com.saudappstudio.snotificationmanager.presentation.components.EnvironmentBadge
 import com.saudappstudio.snotificationmanager.presentation.components.SNotificationConfirmDialog
+import com.saudappstudio.snotificationmanager.presentation.components.SNotificationDialog
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -58,6 +64,7 @@ fun FirebaseProjectsScreen(
 ) {
     val state by viewModel.uiState.collectAsState()
     var projectToDelete by remember { mutableStateOf<FirebaseProjectModel?>(null) }
+    var selectedProjectDetails by remember { mutableStateOf<FirebaseProjectModel?>(null) }
 
     Scaffold(
         topBar = {
@@ -140,8 +147,94 @@ fun FirebaseProjectsScreen(
                     items(state.projects) { project ->
                         FirebaseProjectItem(
                             project = project,
+                            onClick = { selectedProjectDetails = project },
                             onDelete = { projectToDelete = project }
                         )
+                    }
+                }
+            }
+        }
+    }
+
+    // Project Details Dialog
+    selectedProjectDetails?.let { proj ->
+        val associatedApps = state.apps.filter { it.firebaseProjectId == proj.id }
+        val notificationCount = state.notifications.count { n -> associatedApps.any { a -> a.id == n.appId } }
+
+        SNotificationDialog(
+            title = proj.name,
+            icon = Icons.Default.CloudQueue,
+            description = "Detailed mapping configuration and associated application statistics:",
+            onDismissRequest = { selectedProjectDetails = null },
+            confirmText = "Close",
+            onConfirm = { selectedProjectDetails = null }
+        ) {
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text("Environment:", style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.Bold)
+                    EnvironmentBadge(environment = proj.environment)
+                }
+
+                Text("Project ID: ${proj.projectIdentifier}", style = MaterialTheme.typography.bodySmall)
+                Text("Backend Key: ${proj.backendKey}", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.SemiBold)
+                Text("Dispatched Pushes: $notificationCount", style = MaterialTheme.typography.bodySmall)
+
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = "Connected Applications (${associatedApps.size})",
+                    style = MaterialTheme.typography.labelLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
+                )
+
+                if (associatedApps.isEmpty()) {
+                    Text(
+                        text = "No apps connected to this project yet.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                } else {
+                    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                        associatedApps.forEach { app ->
+                            Card(
+                                modifier = Modifier.fillMaxWidth(),
+                                shape = RoundedCornerShape(8.dp),
+                                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+                            ) {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(10.dp),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Column(modifier = Modifier.weight(1f)) {
+                                        Text(
+                                            text = app.name,
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            fontWeight = FontWeight.SemiBold,
+                                            maxLines = 1,
+                                            overflow = TextOverflow.Ellipsis
+                                        )
+                                        Text(
+                                            text = app.packageName,
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                            maxLines = 1,
+                                            overflow = TextOverflow.Ellipsis
+                                        )
+                                    }
+                                    EnvironmentBadge(environment = app.environment)
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -167,9 +260,11 @@ fun FirebaseProjectsScreen(
 @Composable
 private fun FirebaseProjectItem(
     project: FirebaseProjectModel,
+    onClick: () -> Unit,
     onDelete: () -> Unit
 ) {
     OutlinedCard(
+        onClick = onClick,
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(14.dp)
     ) {
@@ -186,7 +281,10 @@ private fun FirebaseProjectItem(
                         text = project.name,
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold,
-                        color = MaterialTheme.colorScheme.onSurface
+                        color = MaterialTheme.colorScheme.onSurface,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.weight(1f, fill = false)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     EnvironmentBadge(environment = project.environment)
@@ -195,13 +293,17 @@ private fun FirebaseProjectItem(
                 Text(
                     text = "Project ID: ${project.projectIdentifier}",
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = "Backend Key: ${project.backendKey}",
                     style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.primary
+                    color = MaterialTheme.colorScheme.primary,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
 

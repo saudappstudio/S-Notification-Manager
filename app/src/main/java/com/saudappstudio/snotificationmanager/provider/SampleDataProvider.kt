@@ -1,4 +1,4 @@
-﻿package com.saudappstudio.snotificationmanager.provider
+package com.saudappstudio.snotificationmanager.provider
 
 import com.saudappstudio.snotificationmanager.domain.model.AppModel
 import com.saudappstudio.snotificationmanager.domain.model.Environment
@@ -107,6 +107,14 @@ object SampleDataProvider {
     )
 
     val topics: List<TopicModel> = listOf(
+        TopicModel(
+            id = "topic_global",
+            name = "global",
+            description = "Global audience across all subscribers",
+            appId = "",
+            environment = Environment.PRODUCTION,
+            enabled = true
+        ),
         TopicModel(
             id = "topic_dict_all",
             name = "dictionary_all",
@@ -285,6 +293,37 @@ object SampleDataProvider {
             status = "FAILED",
             error = "HTTP 400: Malformed topic name. Must match [a-zA-Z0-9-_.~%]+",
             sentAt = System.currentTimeMillis() - 172800000L
+        ),
+        NotificationHistoryModel(
+            id = "hist_05",
+            appId = "app_dictionary",
+            appName = "Advanced English Dictionary",
+            title = "Scheduled Daily Reminder",
+            message = "Scheduled quiz notification to boost active retention.",
+            targetType = TargetType.TOPIC,
+            target = "dictionary_all",
+            environment = Environment.PRODUCTION,
+            status = "SCHEDULED",
+            messageId = "sched_88192a",
+            notificationType = "PUSH",
+            isScheduled = true,
+            scheduledTimestamp = System.currentTimeMillis() + 3600000L,
+            sentAt = System.currentTimeMillis() + 3600000L
+        ),
+        NotificationHistoryModel(
+            id = "hist_06",
+            appId = "app_vocabulary",
+            appName = "Vocabulary Builder",
+            title = "In-App Streak Booster",
+            message = "Triggered after 1 minute of activity in the app.",
+            targetType = TargetType.TOPIC,
+            target = "vocabulary_all",
+            environment = Environment.PRODUCTION,
+            status = "SENT",
+            messageId = "iam_msg_10283",
+            notificationType = "IN_APP",
+            eventTrigger = "timer_1_min",
+            sentAt = System.currentTimeMillis() - 300000L
         )
     )
 }

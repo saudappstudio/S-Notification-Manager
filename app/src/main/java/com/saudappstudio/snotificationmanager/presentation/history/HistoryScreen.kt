@@ -39,6 +39,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.saudappstudio.snotificationmanager.R
 import com.saudappstudio.snotificationmanager.core.ui.ToastManager
@@ -100,7 +101,13 @@ fun HistoryScreen(
             OutlinedTextField(
                 value = state.searchQuery,
                 onValueChange = { viewModel.onSearchQueryChange(it) },
-                placeholder = { Text(stringResource(R.string.history_search_placeholder)) },
+                placeholder = {
+                    Text(
+                        text = stringResource(R.string.history_search_placeholder),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                },
                 leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
@@ -217,26 +224,37 @@ private fun HistoryCardItem(
                         text = item.title,
                         style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onSurface
+                        color = MaterialTheme.colorScheme.onSurface,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.weight(1f, fill = false)
                     )
                     Spacer(modifier = Modifier.width(6.dp))
                     EnvironmentBadge(environment = item.environment)
                 }
                 Spacer(modifier = Modifier.height(3.dp))
+                val targetDisplay = if (item.notificationType == "IN_APP") {
+                    "${item.appName} • In-App [${item.eventTrigger}]"
+                } else {
+                    "${item.appName} • ${item.target}"
+                }
                 Text(
-                    text = "${item.appName} • ${item.target}",
+                    text = targetDisplay,
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
                 Spacer(modifier = Modifier.height(2.dp))
                 val dateFormatted = SimpleDateFormat("MMM dd, HH:mm", Locale.getDefault()).format(Date(item.sentAt))
+                val timeDisplay = if (item.isScheduled) "⏰ Scheduled for $dateFormatted" else dateFormatted
                 Text(
-                    text = dateFormatted,
+                    text = timeDisplay,
                     style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = if (item.isScheduled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
-
+            Spacer(modifier = Modifier.width(8.dp))
             StatusBadge(status = item.status)
         }
     }

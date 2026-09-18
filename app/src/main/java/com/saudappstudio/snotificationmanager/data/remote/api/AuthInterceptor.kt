@@ -1,4 +1,4 @@
-﻿package com.saudappstudio.snotificationmanager.data.remote.api
+package com.saudappstudio.snotificationmanager.data.remote.api
 
 import com.saudappstudio.snotificationmanager.core.datastore.PreferencesManager
 import kotlinx.coroutines.flow.first
@@ -23,7 +23,7 @@ class AuthInterceptor(
             .header("Accept", "application/json")
 
         if (token.isNotBlank()) {
-            newRequestBuilder.header("Authorization", "Bearer ")
+            newRequestBuilder.header("Authorization", "Bearer $token")
         }
 
         return chain.proceed(newRequestBuilder.build())

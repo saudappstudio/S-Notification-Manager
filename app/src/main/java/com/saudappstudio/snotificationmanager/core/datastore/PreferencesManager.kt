@@ -30,6 +30,7 @@ class PreferencesManager(private val context: Context) {
         val TEST_MODE_ONLY = booleanPreferencesKey("test_mode_only")
         val CONFIRM_BEFORE_PROD_SEND = booleanPreferencesKey("confirm_before_prod_send")
         val REQUIRE_BIOMETRIC_FOR_PROD = booleanPreferencesKey("require_biometric_for_prod")
+        val REQUIRE_BIOMETRIC_ON_APP_OPEN = booleanPreferencesKey("require_biometric_on_app_open")
         val DEFAULT_PRIORITY = stringPreferencesKey("default_priority")
         val DEFAULT_CHANNEL_ID = stringPreferencesKey("default_channel_id")
         val LAST_CHECKED_TIMESTAMP = longPreferencesKey("last_checked_timestamp")
@@ -59,6 +60,7 @@ class PreferencesManager(private val context: Context) {
                 testModeOnly = preferences[PreferencesKeys.TEST_MODE_ONLY] ?: false,
                 confirmBeforeProdSend = preferences[PreferencesKeys.CONFIRM_BEFORE_PROD_SEND] ?: true,
                 requireBiometricForProd = preferences[PreferencesKeys.REQUIRE_BIOMETRIC_FOR_PROD] ?: false,
+                requireBiometricOnAppOpen = preferences[PreferencesKeys.REQUIRE_BIOMETRIC_ON_APP_OPEN] ?: false,
                 defaultPriority = preferences[PreferencesKeys.DEFAULT_PRIORITY] ?: "HIGH",
                 defaultChannelId = preferences[PreferencesKeys.DEFAULT_CHANNEL_ID] ?: "general_notifications",
                 lastCheckedTimestamp = preferences[PreferencesKeys.LAST_CHECKED_TIMESTAMP] ?: 0L,
@@ -140,6 +142,17 @@ class PreferencesManager(private val context: Context) {
     suspend fun setRequireBiometricForProd(required: Boolean) {
         context.dataStore.edit { preferences ->
             preferences[PreferencesKeys.REQUIRE_BIOMETRIC_FOR_PROD] = required
+        }
+    }
+
+    /**
+     * Toggles biometric lock required upon opening application.
+     *
+     * @param required True if biometric app lock is active.
+     */
+    suspend fun setRequireBiometricOnAppOpen(required: Boolean) {
+        context.dataStore.edit { preferences ->
+            preferences[PreferencesKeys.REQUIRE_BIOMETRIC_ON_APP_OPEN] = required
         }
     }
 

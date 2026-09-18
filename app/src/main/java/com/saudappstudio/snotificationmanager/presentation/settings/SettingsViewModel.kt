@@ -1,4 +1,4 @@
-﻿package com.saudappstudio.snotificationmanager.presentation.settings
+package com.saudappstudio.snotificationmanager.presentation.settings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -95,6 +95,12 @@ class SettingsViewModel @Inject constructor(
     fun setRequireBiometricForProd(required: Boolean) {
         viewModelScope.launch {
             settingsRepository.setRequireBiometricForProd(required)
+        }
+    }
+
+    fun setRequireBiometricOnAppOpen(required: Boolean) {
+        viewModelScope.launch {
+            settingsRepository.setRequireBiometricOnAppOpen(required)
         }
     }
 

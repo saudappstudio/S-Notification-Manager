@@ -1,4 +1,4 @@
-﻿package com.saudappstudio.snotificationmanager.data.remote.models
+package com.saudappstudio.snotificationmanager.data.remote.models
 
 import com.google.gson.annotations.SerializedName
 
@@ -21,6 +21,10 @@ data class NotificationRequestDto(
     @SerializedName("ttl") val ttl: Long? = null,
     @SerializedName("collapseKey") val collapseKey: String? = null,
     @SerializedName("badge") val badge: Int? = null,
+    @SerializedName("notificationType") val notificationType: String? = null,
+    @SerializedName("eventTrigger") val eventTrigger: String? = null,
+    @SerializedName("isScheduled") val isScheduled: Boolean? = null,
+    @SerializedName("scheduledTimestamp") val scheduledTimestamp: Long? = null,
     @SerializedName("customData") val customData: Map<String, String>? = null
 )
 

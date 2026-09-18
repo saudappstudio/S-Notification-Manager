@@ -1,5 +1,6 @@
 ﻿package com.saudappstudio.snotificationmanager.presentation.navigation
 
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -58,6 +59,7 @@ fun MainNavGraph() {
     val showBottomBar = bottomNavItems.any { it.route == currentRoute }
 
     Scaffold(
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
         bottomBar = {
             if (showBottomBar) {
                 NavigationBar {
@@ -104,13 +106,27 @@ fun MainNavGraph() {
                 AppsScreen(
                     viewModel = viewModel,
                     onNavigate = { route -> navController.navigate(route) },
-                    onAppClick = { appId -> navController.navigate(Screen.AppDetails.createRoute(appId)) }
+                    onAppClick = { appId -> navController.navigate(Screen.AppDetails.createRoute(appId)) },
+                    onEditAppClick = { appId -> navController.navigate(Screen.EditApp.createRoute(appId)) }
                 )
             }
 
             composable(Screen.AddApp.route) {
                 val viewModel: AppsViewModel = hiltViewModel()
                 AddAppScreen(
+                    viewModel = viewModel,
+                    onNavigateBack = { navController.popBackStack() }
+                )
+            }
+
+            composable(
+                route = Screen.EditApp.route,
+                arguments = listOf(navArgument("appId") { type = NavType.StringType })
+            ) { backStackEntry ->
+                val appId = backStackEntry.arguments?.getString("appId") ?: ""
+                val viewModel: AppsViewModel = hiltViewModel()
+                AddAppScreen(
+                    initialAppId = appId,
                     viewModel = viewModel,
                     onNavigateBack = { navController.popBackStack() }
                 )
@@ -126,8 +142,12 @@ fun MainNavGraph() {
                     appId = appId,
                     viewModel = viewModel,
                     onNavigateBack = { navController.popBackStack() },
+                    onEditApp = { id -> navController.navigate(Screen.EditApp.createRoute(id)) },
                     onSendNotificationForApp = { id ->
                         navController.navigate(Screen.SendNotification.createRoute(appId = id))
+                    },
+                    onNotificationClick = { historyId ->
+                        navController.navigate(Screen.NotificationDetails.createRoute(historyId))
                     }
                 )
             }

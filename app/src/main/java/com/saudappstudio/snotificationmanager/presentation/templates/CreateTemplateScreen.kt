@@ -1,4 +1,4 @@
-﻿package com.saudappstudio.snotificationmanager.presentation.templates
+package com.saudappstudio.snotificationmanager.presentation.templates
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -36,6 +36,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.saudappstudio.snotificationmanager.R
 import com.saudappstudio.snotificationmanager.core.ui.ToastManager
@@ -270,7 +271,12 @@ fun CreateTemplateScreen(
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(12.dp)
                 ) {
-                    Text(stringResource(R.string.btn_save))
+                    Text(
+                        text = stringResource(R.string.btn_save),
+                        maxLines = 1,
+                        softWrap = false,
+                        overflow = TextOverflow.Ellipsis
+                    )
                 }
 
                 Button(
@@ -298,7 +304,12 @@ fun CreateTemplateScreen(
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(12.dp)
                 ) {
-                    Text(stringResource(R.string.btn_save_and_send))
+                    Text(
+                        text = stringResource(R.string.btn_save_and_send),
+                        maxLines = 1,
+                        softWrap = false,
+                        overflow = TextOverflow.Ellipsis
+                    )
                 }
             }
 
