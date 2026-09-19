@@ -74,25 +74,25 @@ fun SettingsScreen(
     var uploadPresetInput by remember { mutableStateOf(prefs.cloudinaryUploadPreset) }
 
     LaunchedEffect(prefs.backendUrl) {
-        if (backendUrlInput != prefs.backendUrl && backendUrlInput.isEmpty()) {
+        if (backendUrlInput != prefs.backendUrl) {
             backendUrlInput = prefs.backendUrl
         }
     }
 
     LaunchedEffect(prefs.apiToken) {
-        if (apiTokenInput != prefs.apiToken && apiTokenInput.isEmpty()) {
+        if (apiTokenInput != prefs.apiToken) {
             apiTokenInput = prefs.apiToken
         }
     }
 
     LaunchedEffect(prefs.cloudinaryCloudName) {
-        if (cloudNameInput != prefs.cloudinaryCloudName && cloudNameInput.isEmpty()) {
+        if (cloudNameInput != prefs.cloudinaryCloudName) {
             cloudNameInput = prefs.cloudinaryCloudName
         }
     }
 
     LaunchedEffect(prefs.cloudinaryUploadPreset) {
-        if (uploadPresetInput != prefs.cloudinaryUploadPreset && uploadPresetInput.isEmpty()) {
+        if (uploadPresetInput != prefs.cloudinaryUploadPreset) {
             uploadPresetInput = prefs.cloudinaryUploadPreset
         }
     }

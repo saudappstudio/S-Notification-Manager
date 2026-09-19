@@ -91,7 +91,7 @@ exports.handler = async (event, context) => {
         deepLink: deepLink || "",
         title: title,
         body: message,
-        ...(imageUrl ? { imageUrl: imageUrl } : {}),
+        ...(imageUrl ? { image: imageUrl, imageUrl: imageUrl } : {}),
         ...customData
       },
       android: {
@@ -104,12 +104,12 @@ exports.handler = async (event, context) => {
       fcmMessage.notification = {
         title: title,
         body: message,
-        ...(imageUrl ? { imageUrl: imageUrl } : {})
+        ...(imageUrl ? { image: imageUrl } : {})
       };
       fcmMessage.android.notification = {
         channelId: channelId || "general_notifications",
         sound: "default",
-        ...(imageUrl ? { imageUrl: imageUrl } : {})
+        ...(imageUrl ? { image: imageUrl } : {})
       };
     }
 
