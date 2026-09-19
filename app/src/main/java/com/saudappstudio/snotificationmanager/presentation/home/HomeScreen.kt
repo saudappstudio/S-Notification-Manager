@@ -117,30 +117,12 @@ fun HomeScreen(
                 .padding(paddingValues)
                 .padding(horizontal = 16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
-            contentPadding = PaddingValues(vertical = 12.dp)
+            contentPadding = PaddingValues(top = 12.dp, bottom = 16.dp)
         ) {
             // Safety Test Mode Banner if active
             if (state.userPreferences.testModeOnly) {
                 item {
                     TestModeBanner()
-                }
-            }
-
-            // Header Greeting
-            item {
-                Column {
-                    Text(
-                        text = stringResource(R.string.home_greeting),
-                        style = MaterialTheme.typography.headlineMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = stringResource(R.string.home_subtitle),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
                 }
             }
 
@@ -221,10 +203,6 @@ fun HomeScreen(
                     item = item,
                     onClick = { onNotificationClick(item.id) }
                 )
-            }
-
-            item {
-                Spacer(modifier = Modifier.height(72.dp))
             }
         }
     }

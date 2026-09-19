@@ -15,5 +15,7 @@ data class UserPreferences(
     val defaultPriority: String = "HIGH",
     val defaultChannelId: String = "general_notifications",
     val lastCheckedTimestamp: Long = 0L,
-    val lastBackendStatus: String = "DISCONNECTED"
+    val lastBackendStatus: String = "DISCONNECTED",
+    val cloudinaryCloudName: String = "dvyx3z9vp",
+    val cloudinaryUploadPreset: String = "saud_preset"
 )

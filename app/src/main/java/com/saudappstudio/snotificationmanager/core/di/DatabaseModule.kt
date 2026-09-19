@@ -1,8 +1,10 @@
-﻿package com.saudappstudio.snotificationmanager.core.di
+package com.saudappstudio.snotificationmanager.core.di
 
 import android.content.Context
 import androidx.room.Room
 import com.saudappstudio.snotificationmanager.data.local.dao.AppDao
+import com.saudappstudio.snotificationmanager.data.local.dao.CrashlyticsDao
+import com.saudappstudio.snotificationmanager.data.local.dao.AnalyticsDao
 import com.saudappstudio.snotificationmanager.data.local.dao.FirebaseProjectDao
 import com.saudappstudio.snotificationmanager.data.local.dao.NotificationHistoryDao
 import com.saudappstudio.snotificationmanager.data.local.dao.TemplateDao
@@ -45,4 +47,10 @@ object DatabaseModule {
 
     @Provides
     fun provideNotificationHistoryDao(database: AppDatabase): NotificationHistoryDao = database.notificationHistoryDao()
+
+    @Provides
+    fun provideCrashlyticsDao(database: AppDatabase): CrashlyticsDao = database.crashlyticsDao()
+
+    @Provides
+    fun provideAnalyticsDao(database: AppDatabase): AnalyticsDao = database.analyticsDao()
 }

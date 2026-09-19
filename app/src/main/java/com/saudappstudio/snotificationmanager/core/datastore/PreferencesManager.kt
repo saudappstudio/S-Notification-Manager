@@ -35,6 +35,8 @@ class PreferencesManager(private val context: Context) {
         val DEFAULT_CHANNEL_ID = stringPreferencesKey("default_channel_id")
         val LAST_CHECKED_TIMESTAMP = longPreferencesKey("last_checked_timestamp")
         val LAST_BACKEND_STATUS = stringPreferencesKey("last_backend_status")
+        val CLOUDINARY_CLOUD_NAME = stringPreferencesKey("cloudinary_cloud_name")
+        val CLOUDINARY_UPLOAD_PRESET = stringPreferencesKey("cloudinary_upload_preset")
     }
 
     /**
@@ -64,7 +66,9 @@ class PreferencesManager(private val context: Context) {
                 defaultPriority = preferences[PreferencesKeys.DEFAULT_PRIORITY] ?: "HIGH",
                 defaultChannelId = preferences[PreferencesKeys.DEFAULT_CHANNEL_ID] ?: "general_notifications",
                 lastCheckedTimestamp = preferences[PreferencesKeys.LAST_CHECKED_TIMESTAMP] ?: 0L,
-                lastBackendStatus = preferences[PreferencesKeys.LAST_BACKEND_STATUS] ?: "DISCONNECTED"
+                lastBackendStatus = preferences[PreferencesKeys.LAST_BACKEND_STATUS] ?: "DISCONNECTED",
+                cloudinaryCloudName = preferences[PreferencesKeys.CLOUDINARY_CLOUD_NAME] ?: "dvyx3z9vp",
+                cloudinaryUploadPreset = preferences[PreferencesKeys.CLOUDINARY_UPLOAD_PRESET] ?: "saud_preset"
             )
         }
 
@@ -179,6 +183,19 @@ class PreferencesManager(private val context: Context) {
         context.dataStore.edit { preferences ->
             preferences[PreferencesKeys.LAST_CHECKED_TIMESTAMP] = timestamp
             preferences[PreferencesKeys.LAST_BACKEND_STATUS] = status
+        }
+    }
+
+    /**
+     * Updates Cloudinary cloud name and upload preset settings.
+     *
+     * @param cloudName Cloudinary cloud name.
+     * @param uploadPreset Cloudinary unsigned upload preset.
+     */
+    suspend fun setCloudinaryConfig(cloudName: String, uploadPreset: String) {
+        context.dataStore.edit { preferences ->
+            preferences[PreferencesKeys.CLOUDINARY_CLOUD_NAME] = cloudName
+            preferences[PreferencesKeys.CLOUDINARY_UPLOAD_PRESET] = uploadPreset
         }
     }
 

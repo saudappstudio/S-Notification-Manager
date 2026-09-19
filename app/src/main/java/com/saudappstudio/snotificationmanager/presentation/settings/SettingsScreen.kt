@@ -70,6 +70,8 @@ fun SettingsScreen(
     // Stable local text field states to avoid lag/dropped characters during fast typing
     var backendUrlInput by remember { mutableStateOf(prefs.backendUrl) }
     var apiTokenInput by remember { mutableStateOf(prefs.apiToken) }
+    var cloudNameInput by remember { mutableStateOf(prefs.cloudinaryCloudName) }
+    var uploadPresetInput by remember { mutableStateOf(prefs.cloudinaryUploadPreset) }
 
     LaunchedEffect(prefs.backendUrl) {
         if (backendUrlInput != prefs.backendUrl && backendUrlInput.isEmpty()) {
@@ -80,6 +82,18 @@ fun SettingsScreen(
     LaunchedEffect(prefs.apiToken) {
         if (apiTokenInput != prefs.apiToken && apiTokenInput.isEmpty()) {
             apiTokenInput = prefs.apiToken
+        }
+    }
+
+    LaunchedEffect(prefs.cloudinaryCloudName) {
+        if (cloudNameInput != prefs.cloudinaryCloudName && cloudNameInput.isEmpty()) {
+            cloudNameInput = prefs.cloudinaryCloudName
+        }
+    }
+
+    LaunchedEffect(prefs.cloudinaryUploadPreset) {
+        if (uploadPresetInput != prefs.cloudinaryUploadPreset && uploadPresetInput.isEmpty()) {
+            uploadPresetInput = prefs.cloudinaryUploadPreset
         }
     }
 
@@ -235,6 +249,37 @@ fun SettingsScreen(
                         }
                     }
                 }
+            }
+
+            // SECTION: CLOUDINARY IMAGE STORAGE
+            SectionCard(title = stringResource(R.string.settings_section_cloudinary)) {
+                OutlinedTextField(
+                    value = cloudNameInput,
+                    onValueChange = {
+                        cloudNameInput = it
+                        viewModel.setCloudinaryConfig(it, uploadPresetInput)
+                    },
+                    label = { Text(stringResource(R.string.field_cloudinary_cloud_name)) },
+                    placeholder = { Text("dvyx3z9vp") },
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true,
+                    shape = RoundedCornerShape(12.dp)
+                )
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                OutlinedTextField(
+                    value = uploadPresetInput,
+                    onValueChange = {
+                        uploadPresetInput = it
+                        viewModel.setCloudinaryConfig(cloudNameInput, it)
+                    },
+                    label = { Text(stringResource(R.string.field_cloudinary_upload_preset)) },
+                    placeholder = { Text("saud_preset") },
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true,
+                    shape = RoundedCornerShape(12.dp)
+                )
             }
 
             // SECTION 3: SAFETY & PRODUCTION CONTROLS

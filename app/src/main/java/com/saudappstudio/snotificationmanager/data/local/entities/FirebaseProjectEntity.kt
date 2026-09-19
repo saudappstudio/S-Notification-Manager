@@ -1,4 +1,4 @@
-﻿package com.saudappstudio.snotificationmanager.data.local.entities
+package com.saudappstudio.snotificationmanager.data.local.entities
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -15,6 +15,7 @@ data class FirebaseProjectEntity(
     val projectIdentifier: String,
     val environment: String,
     val backendKey: String,
+    val gaPropertyId: String = "",
     val enabled: Boolean
 ) {
     fun toDomainModel(): FirebaseProjectModel = FirebaseProjectModel(
@@ -23,6 +24,7 @@ data class FirebaseProjectEntity(
         projectIdentifier = projectIdentifier,
         environment = Environment.fromKey(environment),
         backendKey = backendKey,
+        gaPropertyId = gaPropertyId,
         enabled = enabled
     )
 
@@ -33,6 +35,7 @@ data class FirebaseProjectEntity(
             projectIdentifier = model.projectIdentifier,
             environment = model.environment.key,
             backendKey = model.backendKey,
+            gaPropertyId = model.gaPropertyId,
             enabled = model.enabled
         )
     }

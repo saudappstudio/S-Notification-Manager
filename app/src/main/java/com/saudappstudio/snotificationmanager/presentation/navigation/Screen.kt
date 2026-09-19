@@ -36,9 +36,21 @@ sealed class Screen(val route: String) {
         fun createRoute(appId: String = "", templateId: String = "") =
             "send_notification?appId=$appId&templateId=$templateId"
     }
+    object InAppMessaging : Screen("in_app_messaging?appId={appId}") {
+        fun createRoute(appId: String = "") = "in_app_messaging?appId=$appId"
+    }
     object History : Screen("history")
     object NotificationDetails : Screen("notification_details/{historyId}") {
         fun createRoute(historyId: String) = "notification_details/$historyId"
+    }
+    object CrashlyticsDashboard : Screen("crashlytics_dashboard?appId={appId}") {
+        fun createRoute(appId: String = "") = "crashlytics_dashboard?appId=$appId"
+    }
+    object AnalyticsDashboard : Screen("analytics_dashboard?appId={appId}") {
+        fun createRoute(appId: String = "") = "analytics_dashboard?appId=$appId"
+    }
+    object CrashDetails : Screen("crash_details/{issueId}") {
+        fun createRoute(issueId: String) = "crash_details/$issueId"
     }
     object Settings : Screen("settings")
     object BackendSettings : Screen("backend_settings")

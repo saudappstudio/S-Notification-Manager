@@ -11,6 +11,7 @@ import com.saudappstudio.snotificationmanager.domain.model.TargetType
 import com.saudappstudio.snotificationmanager.domain.model.TemplateModel
 import com.saudappstudio.snotificationmanager.domain.model.TopicModel
 import com.saudappstudio.snotificationmanager.domain.repository.AppRepository
+import com.saudappstudio.snotificationmanager.domain.repository.CloudinaryRepository
 import com.saudappstudio.snotificationmanager.domain.repository.FirebaseProjectRepository
 import com.saudappstudio.snotificationmanager.domain.repository.SettingsRepository
 import com.saudappstudio.snotificationmanager.domain.repository.TemplateRepository
@@ -138,7 +139,8 @@ class SendNotificationViewModel @Inject constructor(
     private val topicRepository: TopicRepository,
     private val templateRepository: TemplateRepository,
     private val settingsRepository: SettingsRepository,
-    private val sendNotificationUseCase: SendNotificationUseCase
+    private val sendNotificationUseCase: SendNotificationUseCase,
+    val cloudinaryRepository: CloudinaryRepository
 ) : ViewModel() {
 
     private val _selectedAppId = MutableStateFlow("")

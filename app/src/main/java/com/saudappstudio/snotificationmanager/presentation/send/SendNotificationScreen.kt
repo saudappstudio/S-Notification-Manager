@@ -79,6 +79,7 @@ import com.saudappstudio.snotificationmanager.core.ui.ToastManager
 import com.saudappstudio.snotificationmanager.domain.model.Environment
 import com.saudappstudio.snotificationmanager.domain.model.TargetType
 import com.saudappstudio.snotificationmanager.presentation.components.EnvironmentBadge
+import com.saudappstudio.snotificationmanager.presentation.components.ImagePickerUploadField
 import com.saudappstudio.snotificationmanager.presentation.components.KeyValueEditor
 import com.saudappstudio.snotificationmanager.presentation.components.NotificationPreviewCard
 import com.saudappstudio.snotificationmanager.presentation.components.SNotificationDialog
@@ -97,7 +98,8 @@ fun SendNotificationScreen(
     viewModel: SendNotificationViewModel,
     initialAppId: String = "",
     initialTemplateId: String = "",
-    onNavigateBack: () -> Unit
+    onNavigateBack: () -> Unit,
+    onNavigateToFiam: (String) -> Unit = {}
 ) {
     val state by viewModel.uiState.collectAsState()
     val context = LocalContext.current
@@ -167,6 +169,42 @@ fun SendNotificationScreen(
             // Safety Banner if Test Mode Only active
             if (state.userPreferences.testModeOnly) {
                 TestModeBanner()
+            }
+
+            // In-App Messaging Shortcut Banner
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(14.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer)
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(12.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = "In-App Messaging (FIAM)",
+                            style = MaterialTheme.typography.titleSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSecondaryContainer
+                        )
+                        Text(
+                            text = "Want to design an in-app popup dialog or banner?",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSecondaryContainer
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(8.dp))
+                    OutlinedButton(
+                        onClick = { onNavigateToFiam(state.selectedApp?.id ?: "") },
+                        shape = RoundedCornerShape(10.dp)
+                    ) {
+                        Text(stringResource(R.string.btn_open_fiam_screen))
+                    }
+                }
             }
 
             // STEP 1: APPLICATION SELECTION
@@ -748,14 +786,12 @@ fun SendNotificationScreen(
                         shape = RoundedCornerShape(12.dp)
                     )
 
-                    OutlinedTextField(
-                        value = state.imageUrl,
-                        onValueChange = { viewModel.setImageUrl(it) },
-                        label = { Text(stringResource(R.string.field_image_url)) },
-                        placeholder = { Text("https://example.com/banner.png") },
-                        modifier = Modifier.fillMaxWidth(),
-                        singleLine = true,
-                        shape = RoundedCornerShape(12.dp)
+                    ImagePickerUploadField(
+                        imageUrl = state.imageUrl,
+                        onUrlChange = { viewModel.setImageUrl(it) },
+                        cloudinaryRepository = viewModel.cloudinaryRepository,
+                        cloudName = state.userPreferences.cloudinaryCloudName,
+                        uploadPreset = state.userPreferences.cloudinaryUploadPreset
                     )
                 }
             }

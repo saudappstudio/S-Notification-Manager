@@ -1,19 +1,29 @@
-﻿package com.saudappstudio.snotificationmanager.core.di
+package com.saudappstudio.snotificationmanager.core.di
 
+import android.content.Context
 import com.saudappstudio.snotificationmanager.core.datastore.PreferencesManager
+import com.saudappstudio.snotificationmanager.data.local.dao.AnalyticsDao
 import com.saudappstudio.snotificationmanager.data.local.dao.AppDao
+import com.saudappstudio.snotificationmanager.data.local.dao.CrashlyticsDao
 import com.saudappstudio.snotificationmanager.data.local.dao.FirebaseProjectDao
 import com.saudappstudio.snotificationmanager.data.local.dao.NotificationHistoryDao
 import com.saudappstudio.snotificationmanager.data.local.dao.TemplateDao
 import com.saudappstudio.snotificationmanager.data.local.dao.TopicDao
+import com.saudappstudio.snotificationmanager.data.remote.api.CloudinaryApiService
 import com.saudappstudio.snotificationmanager.data.remote.api.NetlifyApiService
+import com.saudappstudio.snotificationmanager.data.repository.AnalyticsRepositoryImpl
 import com.saudappstudio.snotificationmanager.data.repository.AppRepositoryImpl
+import com.saudappstudio.snotificationmanager.data.repository.CloudinaryRepositoryImpl
+import com.saudappstudio.snotificationmanager.data.repository.CrashlyticsRepositoryImpl
 import com.saudappstudio.snotificationmanager.data.repository.FirebaseProjectRepositoryImpl
 import com.saudappstudio.snotificationmanager.data.repository.NotificationRepositoryImpl
 import com.saudappstudio.snotificationmanager.data.repository.SettingsRepositoryImpl
 import com.saudappstudio.snotificationmanager.data.repository.TemplateRepositoryImpl
 import com.saudappstudio.snotificationmanager.data.repository.TopicRepositoryImpl
+import com.saudappstudio.snotificationmanager.domain.repository.AnalyticsRepository
 import com.saudappstudio.snotificationmanager.domain.repository.AppRepository
+import com.saudappstudio.snotificationmanager.domain.repository.CloudinaryRepository
+import com.saudappstudio.snotificationmanager.domain.repository.CrashlyticsRepository
 import com.saudappstudio.snotificationmanager.domain.repository.FirebaseProjectRepository
 import com.saudappstudio.snotificationmanager.domain.repository.NotificationRepository
 import com.saudappstudio.snotificationmanager.domain.repository.SettingsRepository
@@ -27,6 +37,7 @@ import com.saudappstudio.snotificationmanager.domain.usecase.TestBackendConnecti
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
@@ -100,6 +111,29 @@ object RepositoryModule {
     fun provideImportConfigurationUseCase(
         settingsRepository: SettingsRepository
     ): ImportConfigurationUseCase = ImportConfigurationUseCase(settingsRepository)
+
+    @Provides
+    @Singleton
+    fun provideCloudinaryRepository(
+        @ApplicationContext context: Context,
+        cloudinaryApiService: CloudinaryApiService
+    ): CloudinaryRepository = CloudinaryRepositoryImpl(context, cloudinaryApiService)
+
+    @Provides
+    @Singleton
+    fun provideCrashlyticsRepository(
+        crashlyticsDao: CrashlyticsDao,
+        apiService: NetlifyApiService
+    ): CrashlyticsRepository = CrashlyticsRepositoryImpl(crashlyticsDao, apiService)
+
+    @Provides
+    @Singleton
+    fun provideAnalyticsRepository(
+        analyticsDao: AnalyticsDao,
+        apiService: NetlifyApiService,
+        appDao: AppDao,
+        firebaseProjectDao: FirebaseProjectDao
+    ): AnalyticsRepository = AnalyticsRepositoryImpl(analyticsDao, apiService, appDao, firebaseProjectDao)
 
     @Provides
     @Singleton

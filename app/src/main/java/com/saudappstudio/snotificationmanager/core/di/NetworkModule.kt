@@ -86,4 +86,17 @@ object NetworkModule {
             .build()
             .create(NetlifyApiService::class.java)
     }
+
+    @Provides
+    @Singleton
+    fun provideCloudinaryApiService(
+        okHttpClient: OkHttpClient
+    ): com.saudappstudio.snotificationmanager.data.remote.api.CloudinaryApiService {
+        return Retrofit.Builder()
+            .baseUrl("https://api.cloudinary.com/")
+            .client(okHttpClient)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+            .create(com.saudappstudio.snotificationmanager.data.remote.api.CloudinaryApiService::class.java)
+    }
 }
