@@ -1,0 +1,8 @@
+[build]
+  functions = "functions"
+
+# Map root URL (/) to health check function so visiting the base URL in browser returns status instead of 404
+[[redirects]]
+  from = "/"
+  to = "/.netlify/functions/health"
+  status = 200

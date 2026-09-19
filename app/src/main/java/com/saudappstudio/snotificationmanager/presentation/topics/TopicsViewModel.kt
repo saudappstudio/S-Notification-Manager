@@ -1,4 +1,4 @@
-﻿package com.saudappstudio.snotificationmanager.presentation.topics
+package com.saudappstudio.snotificationmanager.presentation.topics
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -19,7 +19,8 @@ data class TopicsUiState(
     val topics: List<TopicModel> = emptyList(),
     val filteredTopics: List<TopicModel> = emptyList(),
     val apps: List<AppModel> = emptyList(),
-    val searchQuery: String = ""
+    val searchQuery: String = "",
+    val selectedTopicIds: Set<String> = emptySet()
 )
 
 @HiltViewModel
@@ -29,12 +30,14 @@ class TopicsViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _searchQuery = MutableStateFlow("")
+    private val _selectedTopicIds = MutableStateFlow<Set<String>>(emptySet())
 
     val uiState: StateFlow<TopicsUiState> = combine(
         topicRepository.getAllTopics(),
         appRepository.getAllApps(),
-        _searchQuery
-    ) { topics, apps, query ->
+        _searchQuery,
+        _selectedTopicIds
+    ) { topics, apps, query, selected ->
         val filtered = if (query.isBlank()) {
             topics
         } else {
@@ -47,7 +50,8 @@ class TopicsViewModel @Inject constructor(
             topics = topics,
             filteredTopics = filtered,
             apps = apps,
-            searchQuery = query
+            searchQuery = query,
+            selectedTopicIds = selected
         )
     }.stateIn(
         scope = viewModelScope,
@@ -57,6 +61,47 @@ class TopicsViewModel @Inject constructor(
 
     fun onSearchQueryChange(query: String) {
         _searchQuery.value = query
+    }
+
+    fun toggleSelectTopic(id: String) {
+        val current = _selectedTopicIds.value.toMutableSet()
+        if (current.contains(id)) {
+            current.remove(id)
+        } else {
+            current.add(id)
+        }
+        _selectedTopicIds.value = current
+    }
+
+    fun selectAllTopics() {
+        val allIds = uiState.value.filteredTopics.map { it.id }.toSet()
+        _selectedTopicIds.value = allIds
+    }
+
+    fun clearSelection() {
+        _selectedTopicIds.value = emptySet()
+    }
+
+    fun deleteSelectedTopics(onDeleted: () -> Unit) {
+        viewModelScope.launch {
+            val toDelete = _selectedTopicIds.value
+            toDelete.forEach { id ->
+                topicRepository.deleteTopic(id)
+            }
+            _selectedTopicIds.value = emptySet()
+            onDeleted()
+        }
+    }
+
+    fun deleteAllTopics(onDeleted: () -> Unit) {
+        viewModelScope.launch {
+            val allTopics = uiState.value.topics
+            allTopics.forEach { topic ->
+                topicRepository.deleteTopic(topic.id)
+            }
+            _selectedTopicIds.value = emptySet()
+            onDeleted()
+        }
     }
 
     fun saveTopic(topic: TopicModel, onSaved: () -> Unit) {
@@ -74,6 +119,9 @@ class TopicsViewModel @Inject constructor(
     fun deleteTopic(topicId: String, onDeleted: () -> Unit) {
         viewModelScope.launch {
             topicRepository.deleteTopic(topicId)
+            val current = _selectedTopicIds.value.toMutableSet()
+            current.remove(topicId)
+            _selectedTopicIds.value = current
             onDeleted()
         }
     }

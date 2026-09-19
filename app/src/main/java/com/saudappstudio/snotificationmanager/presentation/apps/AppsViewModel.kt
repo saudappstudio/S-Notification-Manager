@@ -1,12 +1,14 @@
-﻿package com.saudappstudio.snotificationmanager.presentation.apps
+package com.saudappstudio.snotificationmanager.presentation.apps
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.saudappstudio.snotificationmanager.domain.model.AppModel
 import com.saudappstudio.snotificationmanager.domain.model.FirebaseProjectModel
+import com.saudappstudio.snotificationmanager.domain.model.NotificationHistoryModel
 import com.saudappstudio.snotificationmanager.domain.model.TopicModel
 import com.saudappstudio.snotificationmanager.domain.repository.AppRepository
 import com.saudappstudio.snotificationmanager.domain.repository.FirebaseProjectRepository
+import com.saudappstudio.snotificationmanager.domain.repository.NotificationRepository
 import com.saudappstudio.snotificationmanager.domain.repository.TopicRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,6 +26,7 @@ data class AppsUiState(
     val projects: List<FirebaseProjectModel> = emptyList(),
     val topics: List<TopicModel> = emptyList(),
     val selectedApp: AppModel? = null,
+    val appNotifications: List<NotificationHistoryModel> = emptyList(),
     val isLoading: Boolean = false,
     val userMessage: String? = null
 )
@@ -32,21 +35,28 @@ data class AppsUiState(
 class AppsViewModel @Inject constructor(
     private val appRepository: AppRepository,
     private val firebaseProjectRepository: FirebaseProjectRepository,
-    private val topicRepository: TopicRepository
+    private val topicRepository: TopicRepository,
+    private val notificationRepository: NotificationRepository
 ) : ViewModel() {
 
     private val _searchQuery = MutableStateFlow("")
     private val _selectedApp = MutableStateFlow<AppModel?>(null)
+    private val _appNotifications = MutableStateFlow<List<NotificationHistoryModel>>(emptyList())
     private val _userMessage = MutableStateFlow<String?>(null)
 
     val uiState: StateFlow<AppsUiState> = combine(
-        appRepository.getAllApps(),
-        firebaseProjectRepository.getAllProjects(),
-        topicRepository.getAllTopics(),
+        combine(
+            appRepository.getAllApps(),
+            firebaseProjectRepository.getAllProjects(),
+            topicRepository.getAllTopics()
+        ) { apps, projects, topics ->
+            Triple(apps, projects, topics)
+        },
         _searchQuery,
         _selectedApp,
+        _appNotifications,
         _userMessage
-    ) { apps, projects, topics, query, selected, message ->
+    ) { (apps, projects, topics), query, selected, appNotifications, message ->
         val filtered = if (query.isBlank()) {
             apps
         } else {
@@ -63,6 +73,7 @@ class AppsViewModel @Inject constructor(
             projects = projects,
             topics = topics,
             selectedApp = selected,
+            appNotifications = appNotifications,
             userMessage = message
         )
     }.stateIn(
@@ -78,6 +89,11 @@ class AppsViewModel @Inject constructor(
     fun loadAppDetails(appId: String) {
         viewModelScope.launch {
             _selectedApp.value = appRepository.getAppById(appId)
+        }
+        viewModelScope.launch {
+            notificationRepository.getHistoryByApp(appId).collect { historyList ->
+                _appNotifications.value = historyList
+            }
         }
     }
 
@@ -118,6 +134,8 @@ class AppsViewModel @Inject constructor(
     fun deleteApp(appId: String, onDeleted: () -> Unit) {
         viewModelScope.launch {
             appRepository.deleteApp(appId)
+            _selectedApp.value = null
+            _appNotifications.value = emptyList()
             onDeleted()
         }
     }

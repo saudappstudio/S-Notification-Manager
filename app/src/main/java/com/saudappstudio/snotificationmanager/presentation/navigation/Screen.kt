@@ -1,4 +1,4 @@
-﻿package com.saudappstudio.snotificationmanager.presentation.navigation
+package com.saudappstudio.snotificationmanager.presentation.navigation
 
 import androidx.annotation.StringRes
 import androidx.compose.material.icons.Icons
@@ -18,7 +18,10 @@ sealed class Screen(val route: String) {
     object Apps : Screen("apps")
     object AddApp : Screen("add_app")
     object AppDetails : Screen("app_details/{appId}") {
-        fun createRoute(appId: String) = "app_details/"
+        fun createRoute(appId: String) = "app_details/$appId"
+    }
+    object EditApp : Screen("edit_app/{appId}") {
+        fun createRoute(appId: String) = "edit_app/$appId"
     }
     object FirebaseProjects : Screen("firebase_projects")
     object AddFirebaseProject : Screen("add_firebase_project")
@@ -27,15 +30,27 @@ sealed class Screen(val route: String) {
     object Templates : Screen("templates")
     object CreateTemplate : Screen("create_template")
     object EditTemplate : Screen("edit_template/{templateId}") {
-        fun createRoute(templateId: String) = "edit_template/"
+        fun createRoute(templateId: String) = "edit_template/$templateId"
     }
     object SendNotification : Screen("send_notification?appId={appId}&templateId={templateId}") {
         fun createRoute(appId: String = "", templateId: String = "") =
-            "send_notification?appId=&templateId="
+            "send_notification?appId=$appId&templateId=$templateId"
+    }
+    object InAppMessaging : Screen("in_app_messaging?appId={appId}") {
+        fun createRoute(appId: String = "") = "in_app_messaging?appId=$appId"
     }
     object History : Screen("history")
     object NotificationDetails : Screen("notification_details/{historyId}") {
-        fun createRoute(historyId: String) = "notification_details/"
+        fun createRoute(historyId: String) = "notification_details/$historyId"
+    }
+    object CrashlyticsDashboard : Screen("crashlytics_dashboard?appId={appId}") {
+        fun createRoute(appId: String = "") = "crashlytics_dashboard?appId=$appId"
+    }
+    object AnalyticsDashboard : Screen("analytics_dashboard?appId={appId}") {
+        fun createRoute(appId: String = "") = "analytics_dashboard?appId=$appId"
+    }
+    object CrashDetails : Screen("crash_details/{issueId}") {
+        fun createRoute(issueId: String) = "crash_details/$issueId"
     }
     object Settings : Screen("settings")
     object BackendSettings : Screen("backend_settings")

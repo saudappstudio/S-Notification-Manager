@@ -1,4 +1,4 @@
-﻿package com.saudappstudio.snotificationmanager.presentation.templates
+package com.saudappstudio.snotificationmanager.presentation.templates
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -44,6 +44,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.saudappstudio.snotificationmanager.R
 import com.saudappstudio.snotificationmanager.domain.model.TemplateModel
@@ -99,7 +100,13 @@ fun TemplatesScreen(
             OutlinedTextField(
                 value = state.searchQuery,
                 onValueChange = { viewModel.onSearchQueryChange(it) },
-                placeholder = { Text(stringResource(R.string.templates_search_placeholder)) },
+                placeholder = {
+                    Text(
+                        text = stringResource(R.string.templates_search_placeholder),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                },
                 leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
@@ -269,7 +276,12 @@ private fun TemplateCardItem(
                 ) {
                     Icon(Icons.Default.Send, contentDescription = null)
                     Spacer(modifier = Modifier.padding(horizontal = 2.dp))
-                    Text(stringResource(R.string.btn_use_template))
+                    Text(
+                        text = stringResource(R.string.btn_use_template),
+                        maxLines = 1,
+                        softWrap = false,
+                        overflow = TextOverflow.Ellipsis
+                    )
                 }
             }
         }

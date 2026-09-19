@@ -200,7 +200,7 @@
     <string name="theme_light">Light</string>
     <string name="theme_dark">Dark</string>
     <string name="backend_url_title">Netlify Backend URL</string>
-    <string name="backend_url_hint">https://your-site.netlify.app/.netlify/functions</string>
+    <string name="backend_url_hint">https://saudnotificationmanager.netlify.app/.netlify/functions</string>
     <string name="api_token_title">API Authentication Token</string>
     <string name="api_token_hint">Bearer API Secret Token</string>
     <string name="api_status_title">Backend Status</string>
@@ -213,6 +213,12 @@
     <!-- Dialogs & Confirmations -->
     <string name="dialog_confirm_production_title">Confirm Production Send</string>
     <string name="dialog_confirm_production_msg">You are about to dispatch a live push notification to real production users. This action cannot be revoked.</string>
+    <string name="dialog_confirm_send_title">Confirm Send Notification</string>
+    <string name="dialog_confirm_send_msg">Are you sure you want to dispatch this notification?</string>
+    <string name="dialog_confirm_test_send_title">Confirm Test Send</string>
+    <string name="dialog_confirm_test_send_msg">Are you sure you want to dispatch a test notification?</string>
+    <string name="progress_sending_title">Sending Notification…</string>
+    <string name="progress_sending_desc">Connecting to backend and dispatching push payload…</string>
     <string name="dialog_delete_title">Confirm Deletion</string>
     <string name="dialog_delete_msg">Are you sure you want to delete \"%1$s\"? This cannot be undone.</string>
     <string name="dialog_clear_history_title">Clear History</string>
@@ -260,4 +266,165 @@
     <string name="msg_offline_blocked">Device is offline. An active network connection is required to send pushes.</string>
     <string name="msg_production_blocked_by_test_mode">Production dispatch blocked: Test Mode Only is currently active in Safety Controls.</string>
     <string name="msg_validation_missing_fields">Please fill in all required fields before proceeding.</string>
+
+    <!-- Notification Types & In-App Messaging -->
+    <string name="field_notification_type">Notification Type</string>
+    <string name="notification_type_push">Standard Push Notification</string>
+    <string name="notification_type_in_app">In-App Messaging</string>
+    <string name="field_event_trigger">Event Trigger</string>
+    <string name="event_timer_1_min">1 Minute (60 seconds) [timer_1_min]</string>
+    <string name="event_timer_90_sec">90 Seconds (90 seconds) [timer_90_sec]</string>
+    <string name="event_timer_2_min">2 Minutes (120 seconds) [timer_2_min]</string>
+    <string name="event_timer_3_min">3 Minutes (180 seconds) [timer_3_min]</string>
+    <string name="event_timer_4_min">4 Minutes (240 seconds) [timer_4_min]</string>
+    <string name="event_app_open">App Open (app_open)</string>
+    <string name="event_session_start">Session Start (session_start)</string>
+    <string name="event_first_purchase">First Purchase (first_purchase)</string>
+    <string name="event_custom">Custom Event</string>
+    <string name="pref_show_primary_button">Include Primary Action Button</string>
+    <string name="field_primary_button_text">Button Label / Text</string>
+    <string name="field_primary_button_url">Action Link / Web URL / Deep Link</string>
+    <string name="placeholder_primary_button_text">e.g. Learn More, Claim Offer, Open Link</string>
+    <string name="placeholder_primary_button_url">e.g. https://example.com or app://promo</string>
+    <string name="in_app_preview_badge">In-App Dialog Preview</string>
+    <string name="in_app_preview_cta_hint">Navigates to: %1$s</string>
+
+    <!-- Notification Scheduling -->
+    <string name="field_dispatch_mode">Dispatch Mode</string>
+    <string name="dispatch_mode_now">Send Immediately</string>
+    <string name="dispatch_mode_schedule">Schedule Notification</string>
+    <string name="field_schedule_delay">Schedule Delay</string>
+    <string name="schedule_in_1_min">In 1 Minute</string>
+    <string name="schedule_in_15_min">In 15 Minutes</string>
+    <string name="schedule_in_1_hour">In 1 Hour</string>
+    <string name="schedule_in_1_day">In 1 Day</string>
+    <string name="btn_schedule_notification">Schedule Notification</string>
+    <string name="msg_notification_scheduled_success">Notification scheduled successfully!</string>
+    <string name="status_scheduled">⏰ Scheduled</string>
+
+    <!-- Advanced Notification Scheduling Modes -->
+    <string name="schedule_mode_presets">Quick Presets</string>
+    <string name="schedule_mode_custom_delay">Custom Delay</string>
+    <string name="schedule_mode_exact_time">Specific Date &amp; Time</string>
+    <string name="schedule_preset_5min">In 5 Mins</string>
+    <string name="schedule_preset_15min">In 15 Mins</string>
+    <string name="schedule_preset_30min">In 30 Mins</string>
+    <string name="schedule_preset_1hr">In 1 Hour</string>
+    <string name="schedule_preset_2hr">In 2 Hours</string>
+    <string name="schedule_preset_6hr">In 6 Hours</string>
+    <string name="schedule_preset_12hr">In 12 Hours</string>
+    <string name="schedule_preset_1day">In 1 Day</string>
+    <string name="schedule_preset_2day">In 2 Days</string>
+    <string name="schedule_preset_1week">In 1 Week</string>
+    <string name="schedule_unit_minutes">Minutes</string>
+    <string name="schedule_unit_hours">Hours</string>
+    <string name="schedule_unit_days">Days</string>
+    <string name="field_custom_delay_value">Delay Amount</string>
+    <string name="field_custom_delay_unit">Time Unit</string>
+    <string name="btn_select_date">Select Date</string>
+    <string name="btn_select_time">Select Time</string>
+    <string name="label_scheduled_target_time">Scheduled Delivery Time:</string>
+    <string name="err_invalid_delay_value">Please enter a valid positive number for schedule delay.</string>
+    <string name="err_scheduled_time_past">Scheduled time must be in the future.</string>
+
+    <!-- History & Details Additions -->
+    <string name="detail_scheduled_time">Scheduled Time</string>
+    <string name="detail_notification_type">Notification Type</string>
+    <string name="detail_event_trigger">Event Trigger</string>
+
+    <!-- Dedicated FIAM Screen & Cloudinary Additions -->
+    <string name="home_qa_fiam_title">In-App Messaging</string>
+    <string name="home_qa_fiam_desc">Popups &amp; banners</string>
+    <string name="btn_upload_image_cloudinary">Upload Image to Cloudinary</string>
+    <string name="label_uploading_to_cloudinary">Uploading image to Cloudinary…</string>
+    <string name="msg_image_uploaded_success">Image uploaded to Cloudinary successfully!</string>
+    <string name="msg_image_upload_failed">Failed to upload image: %1$s</string>
+    <string name="fiam_title">In-App Messaging (FIAM)</string>
+    <string name="fiam_subtitle">Design &amp; dispatch Firebase In-App Messaging popups</string>
+    <string name="fiam_layout_type">Message Layout Format</string>
+    <string name="fiam_layout_card">Card Popup</string>
+    <string name="fiam_layout_modal">Modal Dialog</string>
+    <string name="fiam_layout_banner">Banner</string>
+    <string name="fiam_layout_image_only">Image Only</string>
+    <string name="fiam_field_secondary_button_text">Secondary Button Label (Optional)</string>
+    <string name="fiam_field_secondary_button_url">Secondary Action Link / Web URL</string>
+    <string name="btn_send_fiam">Send In-App Message</string>
+    <string name="btn_open_fiam_screen">Go to FIAM Screen</string>
+    <string name="settings_section_cloudinary">Cloudinary Image Storage Settings</string>
+    <string name="field_cloudinary_cloud_name">Cloud Name</string>
+    <string name="field_cloudinary_upload_preset">Unsigned Upload Preset</string>
+
+    <!-- Firebase Crashlytics Feature -->
+    <string name="crashlytics_title">Firebase Crashlytics</string>
+    <string name="crashlytics_subtitle">Real-time crash monitoring and exception details</string>
+    <string name="crashlytics_dashboard">Crash Dashboard</string>
+    <string name="crashlytics_details">Crash Details</string>
+    <string name="crash_metric_total">Total Crashes</string>
+    <string name="crash_metric_users">Affected Users</string>
+    <string name="crash_metric_free_rate">Crash-Free Rate</string>
+    <string name="crash_metric_fatal">Fatal Crashes</string>
+    <string name="crash_metric_non_fatal">Non-Fatal Errors</string>
+    <string name="crash_filter_all_apps">All Apps</string>
+    <string name="crash_filter_fatal">Fatal</string>
+    <string name="crash_filter_non_fatal">Non-Fatal</string>
+    <string name="crash_filter_status_open">Open</string>
+    <string name="crash_filter_status_resolved">Resolved</string>
+    <string name="crash_filter_status_muted">Muted</string>
+    <string name="crash_search_placeholder">Search stack trace or package…</string>
+    <string name="crash_empty_title">No Crashes Found</string>
+    <string name="crash_empty_desc">No crash logs found for the selected app or filter criteria. Your apps are running smoothly!</string>
+    <string name="btn_load_sample_crashes">Load Demo Crash Data</string>
+    <string name="btn_configure_firebase">Configure Firebase Project</string>
+    <string name="crash_stack_trace_header">Exception Stack Trace</string>
+    <string name="crash_device_diagnostics">Device &amp; OS Diagnostics</string>
+    <string name="crash_device_model">Device Model</string>
+    <string name="crash_os_version">Android OS</string>
+    <string name="crash_ram_free">Available RAM</string>
+    <string name="crash_disk_free">Available Storage</string>
+    <string name="crash_top_frame">Top Stack Frame</string>
+    <string name="crash_events_count">%1$d crashes</string>
+    <string name="crash_users_count">%1$d users</string>
+    <string name="crash_app_version">App Version: %1$s</string>
+    <string name="crash_first_seen">First seen: %1$s</string>
+    <string name="crash_last_seen">Last seen: %1$s</string>
+    <string name="btn_mark_resolved">Mark Resolved</string>
+    <string name="btn_mark_open">Reopen Issue</string>
+    <string name="btn_copy_stacktrace">Copy Stack Trace</string>
+    <string name="msg_stacktrace_copied">Stack trace copied to clipboard!</string>
+    <string name="msg_status_updated">Crash issue status updated!</string>
+    <string name="msg_sample_data_loaded">Demo crash reports loaded successfully!</string>
+    <string name="home_qa_crashlytics_title">Crashlytics</string>
+    <string name="home_qa_crashlytics_desc">Monitor app crashes</string>
+    <string name="btn_view_crashes">View Crash Reports</string>
+
+    <!-- Firebase Analytics Feature -->
+    <string name="analytics_title">Firebase Analytics</string>
+    <string name="analytics_subtitle">Real-time user behavior, events &amp; notification conversions</string>
+    <string name="home_qa_analytics_title">Analytics</string>
+    <string name="home_qa_analytics_desc">Events &amp; user stats</string>
+    <string name="analytics_metric_dau">Active Users (DAU)</string>
+    <string name="analytics_metric_wau">Weekly Users (WAU)</string>
+    <string name="analytics_metric_mau">Monthly Users (MAU)</string>
+    <string name="analytics_metric_total_events">Total Logged Events</string>
+    <string name="analytics_metric_avg_session">Avg Session Time</string>
+    <string name="analytics_metric_conversion_rate">Push Open Rate</string>
+    <string name="analytics_realtime_active">Live Active Users (30 min)</string>
+    <string name="analytics_section_events">Top Tracked Events</string>
+    <string name="analytics_section_demographics">Device &amp; OS Demographics</string>
+    <string name="analytics_time_today">Today</string>
+    <string name="analytics_time_7d">Last 7 Days</string>
+    <string name="analytics_time_30d">Last 30 Days</string>
+    <string name="analytics_time_90d">Last 90 Days</string>
+    <string name="analytics_search_placeholder">Search events by name or category…</string>
+    <string name="analytics_empty_title">No Event Analytics Found</string>
+    <string name="analytics_empty_desc">No analytics logs recorded for the selected filter. Try selecting a different timeframe or app.</string>
+    <string name="btn_load_sample_analytics">Load Demo Analytics Data</string>
+    <string name="analytics_event_name_header">Event Name</string>
+    <string name="analytics_event_count_header">Event Count</string>
+    <string name="analytics_event_users_header">Unique Users</string>
+    <string name="analytics_event_trend_header">Growth Trend</string>
+    <string name="analytics_export_report">Export Report (JSON)</string>
+    <string name="analytics_open_console">Open Firebase Console</string>
+    <string name="msg_analytics_exported">Analytics report copied to clipboard!</string>
+    <string name="msg_analytics_sample_loaded">Demo analytics data loaded successfully!</string>
 </resources>

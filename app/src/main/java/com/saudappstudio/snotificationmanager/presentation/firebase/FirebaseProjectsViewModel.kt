@@ -1,9 +1,13 @@
-﻿package com.saudappstudio.snotificationmanager.presentation.firebase
+package com.saudappstudio.snotificationmanager.presentation.firebase
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.saudappstudio.snotificationmanager.domain.model.AppModel
 import com.saudappstudio.snotificationmanager.domain.model.FirebaseProjectModel
+import com.saudappstudio.snotificationmanager.domain.model.NotificationHistoryModel
+import com.saudappstudio.snotificationmanager.domain.repository.AppRepository
 import com.saudappstudio.snotificationmanager.domain.repository.FirebaseProjectRepository
+import com.saudappstudio.snotificationmanager.domain.repository.NotificationRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -16,20 +20,26 @@ import javax.inject.Inject
 data class FirebaseProjectsUiState(
     val projects: List<FirebaseProjectModel> = emptyList(),
     val searchQuery: String = "",
-    val filteredProjects: List<FirebaseProjectModel> = emptyList()
+    val filteredProjects: List<FirebaseProjectModel> = emptyList(),
+    val apps: List<AppModel> = emptyList(),
+    val notifications: List<NotificationHistoryModel> = emptyList()
 )
 
 @HiltViewModel
 class FirebaseProjectsViewModel @Inject constructor(
-    private val firebaseProjectRepository: FirebaseProjectRepository
+    private val firebaseProjectRepository: FirebaseProjectRepository,
+    private val appRepository: AppRepository,
+    private val notificationRepository: NotificationRepository
 ) : ViewModel() {
 
     private val _searchQuery = MutableStateFlow("")
 
     val uiState: StateFlow<FirebaseProjectsUiState> = combine(
         firebaseProjectRepository.getAllProjects(),
+        appRepository.getAllApps(),
+        notificationRepository.getAllHistory(),
         _searchQuery
-    ) { projects, query ->
+    ) { projects, apps, notifications, query ->
         val filtered = if (query.isBlank()) {
             projects
         } else {
@@ -42,7 +52,9 @@ class FirebaseProjectsViewModel @Inject constructor(
         FirebaseProjectsUiState(
             projects = projects,
             searchQuery = query,
-            filteredProjects = filtered
+            filteredProjects = filtered,
+            apps = apps,
+            notifications = notifications
         )
     }.stateIn(
         scope = viewModelScope,

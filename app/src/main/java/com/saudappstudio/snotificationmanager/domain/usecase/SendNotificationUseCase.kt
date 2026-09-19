@@ -1,4 +1,4 @@
-﻿package com.saudappstudio.snotificationmanager.domain.usecase
+package com.saudappstudio.snotificationmanager.domain.usecase
 
 import com.saudappstudio.snotificationmanager.domain.model.Environment
 import com.saudappstudio.snotificationmanager.domain.model.NotificationHistoryModel
@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.first
 import java.util.UUID
 
 /**
- * UseCase to dispatch a notification to the Netlify backend and record the result in Room history.
+ * UseCase to dispatch or schedule a push / in-app notification to the Netlify backend and record the result in Room history.
  * Enforces safety controls: blocks production sends if Test Mode Only is enabled.
  */
 class SendNotificationUseCase(
@@ -17,7 +17,7 @@ class SendNotificationUseCase(
     private val settingsRepository: SettingsRepository
 ) {
     /**
-     * Dispatches notification and persists history record.
+     * Dispatches or schedules notification and persists history record.
      *
      * @param appName Client application display name for history tracking.
      * @param payload Target payload.
@@ -34,6 +34,13 @@ class SendNotificationUseCase(
         // Enforce safety rule: if Test Mode Only is enabled, block production sends
         if (payload.environment == Environment.PRODUCTION && userPrefs.testModeOnly) {
             return Result.failure(IllegalStateException("Production dispatch blocked by Test Mode Only"))
+        }
+
+        // Check if scheduling requested
+        if (payload.isScheduled) {
+            val scheduleResult = notificationRepository.scheduleNotification(appName, payload)
+            settingsRepository.setLastSelectedAppId(payload.appId)
+            return scheduleResult
         }
 
         val result = if (isTest) {
@@ -57,6 +64,10 @@ class SendNotificationUseCase(
             imageUrl = payload.imageUrl,
             clickAction = payload.clickAction,
             deepLink = payload.deepLink,
+            notificationType = payload.notificationType,
+            eventTrigger = payload.eventTrigger,
+            isScheduled = false,
+            scheduledTimestamp = null,
             customData = payload.customData,
             sentAt = System.currentTimeMillis()
         )

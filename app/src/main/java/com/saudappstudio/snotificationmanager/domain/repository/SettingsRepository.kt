@@ -1,4 +1,4 @@
-﻿package com.saudappstudio.snotificationmanager.domain.repository
+package com.saudappstudio.snotificationmanager.domain.repository
 
 import com.saudappstudio.snotificationmanager.core.datastore.UserPreferences
 import com.saudappstudio.snotificationmanager.domain.model.BackendHealthModel
@@ -17,6 +17,7 @@ interface SettingsRepository {
     suspend fun setTestModeOnly(enabled: Boolean)
     suspend fun setConfirmBeforeProdSend(required: Boolean)
     suspend fun setRequireBiometricForProd(required: Boolean)
+    suspend fun setRequireBiometricOnAppOpen(required: Boolean)
     suspend fun setDefaultNotificationSettings(channelId: String, priority: String)
     suspend fun checkBackendHealth(): Result<BackendHealthModel>
     suspend fun resetSettings()

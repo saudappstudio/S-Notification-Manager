@@ -1,8 +1,9 @@
-﻿package com.saudappstudio.snotificationmanager.presentation.settings
+package com.saudappstudio.snotificationmanager.presentation.settings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
+import com.saudappstudio.snotificationmanager.core.datastore.PreferencesManager
 import com.saudappstudio.snotificationmanager.core.datastore.UserPreferences
 import com.saudappstudio.snotificationmanager.domain.model.BackendHealthModel
 import com.saudappstudio.snotificationmanager.domain.model.ExportDataModel
@@ -32,6 +33,7 @@ data class SettingsUiState(
 class SettingsViewModel @Inject constructor(
     private val settingsRepository: SettingsRepository,
     private val notificationRepository: NotificationRepository,
+    private val preferencesManager: PreferencesManager,
     private val testBackendConnectionUseCase: TestBackendConnectionUseCase,
     private val exportConfigurationUseCase: ExportConfigurationUseCase,
     private val importConfigurationUseCase: ImportConfigurationUseCase
@@ -95,6 +97,18 @@ class SettingsViewModel @Inject constructor(
     fun setRequireBiometricForProd(required: Boolean) {
         viewModelScope.launch {
             settingsRepository.setRequireBiometricForProd(required)
+        }
+    }
+
+    fun setRequireBiometricOnAppOpen(required: Boolean) {
+        viewModelScope.launch {
+            settingsRepository.setRequireBiometricOnAppOpen(required)
+        }
+    }
+
+    fun setCloudinaryConfig(cloudName: String, uploadPreset: String) {
+        viewModelScope.launch {
+            preferencesManager.setCloudinaryConfig(cloudName, uploadPreset)
         }
     }
 

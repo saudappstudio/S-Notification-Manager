@@ -1,5 +1,6 @@
-﻿package com.saudappstudio.snotificationmanager.presentation.navigation
+package com.saudappstudio.snotificationmanager.presentation.navigation
 
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -25,6 +26,8 @@ import com.saudappstudio.snotificationmanager.presentation.apps.AppsViewModel
 import com.saudappstudio.snotificationmanager.presentation.firebase.AddFirebaseProjectScreen
 import com.saudappstudio.snotificationmanager.presentation.firebase.FirebaseProjectsScreen
 import com.saudappstudio.snotificationmanager.presentation.firebase.FirebaseProjectsViewModel
+import com.saudappstudio.snotificationmanager.presentation.fiam.InAppMessagingScreen
+import com.saudappstudio.snotificationmanager.presentation.fiam.InAppMessagingViewModel
 import com.saudappstudio.snotificationmanager.presentation.history.HistoryScreen
 import com.saudappstudio.snotificationmanager.presentation.history.HistoryViewModel
 import com.saudappstudio.snotificationmanager.presentation.history.NotificationDetailsScreen
@@ -40,6 +43,8 @@ import com.saudappstudio.snotificationmanager.presentation.templates.TemplatesVi
 import com.saudappstudio.snotificationmanager.presentation.topics.AddTopicScreen
 import com.saudappstudio.snotificationmanager.presentation.topics.TopicsScreen
 import com.saudappstudio.snotificationmanager.presentation.topics.TopicsViewModel
+import com.saudappstudio.snotificationmanager.presentation.analytics.AnalyticsDashboardScreen
+import com.saudappstudio.snotificationmanager.presentation.analytics.AnalyticsViewModel
 
 @Composable
 fun MainNavGraph() {
@@ -58,6 +63,7 @@ fun MainNavGraph() {
     val showBottomBar = bottomNavItems.any { it.route == currentRoute }
 
     Scaffold(
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
         bottomBar = {
             if (showBottomBar) {
                 NavigationBar {
@@ -104,13 +110,27 @@ fun MainNavGraph() {
                 AppsScreen(
                     viewModel = viewModel,
                     onNavigate = { route -> navController.navigate(route) },
-                    onAppClick = { appId -> navController.navigate(Screen.AppDetails.createRoute(appId)) }
+                    onAppClick = { appId -> navController.navigate(Screen.AppDetails.createRoute(appId)) },
+                    onEditAppClick = { appId -> navController.navigate(Screen.EditApp.createRoute(appId)) }
                 )
             }
 
             composable(Screen.AddApp.route) {
                 val viewModel: AppsViewModel = hiltViewModel()
                 AddAppScreen(
+                    viewModel = viewModel,
+                    onNavigateBack = { navController.popBackStack() }
+                )
+            }
+
+            composable(
+                route = Screen.EditApp.route,
+                arguments = listOf(navArgument("appId") { type = NavType.StringType })
+            ) { backStackEntry ->
+                val appId = backStackEntry.arguments?.getString("appId") ?: ""
+                val viewModel: AppsViewModel = hiltViewModel()
+                AddAppScreen(
+                    initialAppId = appId,
                     viewModel = viewModel,
                     onNavigateBack = { navController.popBackStack() }
                 )
@@ -126,8 +146,18 @@ fun MainNavGraph() {
                     appId = appId,
                     viewModel = viewModel,
                     onNavigateBack = { navController.popBackStack() },
+                    onEditApp = { id -> navController.navigate(Screen.EditApp.createRoute(id)) },
                     onSendNotificationForApp = { id ->
                         navController.navigate(Screen.SendNotification.createRoute(appId = id))
+                    },
+                    onNotificationClick = { historyId ->
+                        navController.navigate(Screen.NotificationDetails.createRoute(historyId))
+                    },
+                    onViewCrashes = { id ->
+                        navController.navigate(Screen.CrashlyticsDashboard.createRoute(appId = id))
+                    },
+                    onViewAnalytics = { id ->
+                        navController.navigate(Screen.AnalyticsDashboard.createRoute(appId = id))
                     }
                 )
             }
@@ -191,7 +221,7 @@ fun MainNavGraph() {
                 )
             }
 
-            // Send Notification (Primary Screen)
+            // Send Notification (Primary Push Screen)
             composable(
                 route = Screen.SendNotification.route,
                 arguments = listOf(
@@ -212,6 +242,26 @@ fun MainNavGraph() {
                     viewModel = viewModel,
                     initialAppId = appId,
                     initialTemplateId = templateId,
+                    onNavigateBack = { navController.popBackStack() },
+                    onNavigateToFiam = { id -> navController.navigate(Screen.InAppMessaging.createRoute(id)) }
+                )
+            }
+
+            // In-App Messaging (Dedicated FIAM Screen)
+            composable(
+                route = Screen.InAppMessaging.route,
+                arguments = listOf(
+                    navArgument("appId") {
+                        type = NavType.StringType
+                        defaultValue = ""
+                    }
+                )
+            ) { backStackEntry ->
+                val appId = backStackEntry.arguments?.getString("appId") ?: ""
+                val viewModel: InAppMessagingViewModel = hiltViewModel()
+                InAppMessagingScreen(
+                    viewModel = viewModel,
+                    initialAppId = appId,
                     onNavigateBack = { navController.popBackStack() }
                 )
             }
@@ -240,6 +290,67 @@ fun MainNavGraph() {
                     onSendAgain = { appId, _ ->
                         navController.navigate(Screen.SendNotification.createRoute(appId = appId))
                     }
+                )
+            }
+
+            // Crashlytics Dashboard & Details
+            composable(
+                route = Screen.CrashlyticsDashboard.route,
+                arguments = listOf(
+                    navArgument("appId") {
+                        type = NavType.StringType
+                        defaultValue = ""
+                    }
+                )
+            ) { backStackEntry ->
+                val appId = backStackEntry.arguments?.getString("appId") ?: ""
+                val viewModel: com.saudappstudio.snotificationmanager.presentation.crashlytics.CrashlyticsViewModel = hiltViewModel()
+                if (appId.isNotBlank()) {
+                    viewModel.onAppSelected(appId)
+                }
+                com.saudappstudio.snotificationmanager.presentation.crashlytics.CrashlyticsDashboardScreen(
+                    viewModel = viewModel,
+                    onNavigateBack = { navController.popBackStack() },
+                    onIssueSelected = { issue ->
+                        navController.navigate(Screen.CrashDetails.createRoute(issue.id))
+                    },
+                    onNavigateToFirebaseSettings = {
+                        navController.navigate(Screen.FirebaseProjects.route)
+                    }
+                )
+            }
+
+            composable(
+                route = Screen.CrashDetails.route,
+                arguments = listOf(navArgument("issueId") { type = NavType.StringType })
+            ) { backStackEntry ->
+                val issueId = backStackEntry.arguments?.getString("issueId") ?: ""
+                val viewModel: com.saudappstudio.snotificationmanager.presentation.crashlytics.CrashlyticsViewModel = hiltViewModel()
+                com.saudappstudio.snotificationmanager.presentation.crashlytics.CrashDetailsScreen(
+                    issueId = issueId,
+                    viewModel = viewModel,
+                    onNavigateBack = { navController.popBackStack() }
+                )
+            }
+
+            // Analytics Dashboard
+            composable(
+                route = Screen.AnalyticsDashboard.route,
+                arguments = listOf(
+                    navArgument("appId") {
+                        type = NavType.StringType
+                        defaultValue = ""
+                    }
+                )
+            ) { backStackEntry ->
+                val appId = backStackEntry.arguments?.getString("appId") ?: ""
+                val viewModel: AnalyticsViewModel = hiltViewModel()
+                if (appId.isNotBlank()) {
+                    viewModel.onAppSelected(appId)
+                }
+                AnalyticsDashboardScreen(
+                    viewModel = viewModel,
+                    onNavigateUp = { navController.popBackStack() }
                 )
             }
 

@@ -1,6 +1,6 @@
-﻿package com.saudappstudio.snotificationmanager.presentation.apps
+package com.saudappstudio.snotificationmanager.presentation.apps
 
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -21,8 +22,6 @@ import androidx.compose.material.icons.filled.CloudQueue
 import androidx.compose.material.icons.filled.Forum
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.AssistChip
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -40,20 +39,33 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.saudappstudio.snotificationmanager.R
+import com.saudappstudio.snotificationmanager.core.ui.ToastManager
 import com.saudappstudio.snotificationmanager.domain.model.AppModel
 import com.saudappstudio.snotificationmanager.presentation.components.EmptyStateView
 import com.saudappstudio.snotificationmanager.presentation.components.EnvironmentBadge
+import com.saudappstudio.snotificationmanager.presentation.components.SNotificationConfirmDialog
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material3.IconButton
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppsScreen(
     viewModel: AppsViewModel,
     onNavigate: (String) -> Unit,
-    onAppClick: (String) -> Unit
+    onAppClick: (String) -> Unit,
+    onEditAppClick: (String) -> Unit = {}
 ) {
     val state by viewModel.uiState.collectAsState()
+    val context = LocalContext.current
+    var appToDelete by remember { mutableStateOf<AppModel?>(null) }
 
     Scaffold(
         topBar = {
@@ -97,11 +109,17 @@ fun AppsScreen(
             )
             Spacer(modifier = Modifier.height(12.dp))
 
-            // Search Bar
+            // Search Bar (Single Line constraint for text and hint)
             OutlinedTextField(
                 value = state.searchQuery,
                 onValueChange = { viewModel.onSearchQueryChange(it) },
-                placeholder = { Text(stringResource(R.string.apps_search_placeholder)) },
+                placeholder = {
+                    Text(
+                        text = stringResource(R.string.apps_search_placeholder),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                },
                 leadingIcon = {
                     Icon(
                         imageVector = Icons.Default.Search,
@@ -116,14 +134,23 @@ fun AppsScreen(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // Sub-manager Navigation Chips (Firebase Projects & Topics)
+            // Sub-manager Navigation Chips (Firebase Projects & Topics) with horizontal scroll to prevent text wrapping
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .horizontalScroll(rememberScrollState()),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 AssistChip(
                     onClick = { onNavigate("firebase_projects") },
-                    label = { Text(stringResource(R.string.apps_manage_firebase_projects)) },
+                    label = {
+                        Text(
+                            text = stringResource(R.string.apps_manage_firebase_projects),
+                            maxLines = 1,
+                            softWrap = false,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    },
                     leadingIcon = {
                         Icon(
                             imageVector = Icons.Default.CloudQueue,
@@ -136,7 +163,14 @@ fun AppsScreen(
 
                 AssistChip(
                     onClick = { onNavigate("topics") },
-                    label = { Text(stringResource(R.string.apps_manage_topics)) },
+                    label = {
+                        Text(
+                            text = stringResource(R.string.apps_manage_topics),
+                            maxLines = 1,
+                            softWrap = false,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    },
                     leadingIcon = {
                         Icon(
                             imageVector = Icons.Default.Forum,
@@ -167,12 +201,31 @@ fun AppsScreen(
                         AppCardItem(
                             app = app,
                             projectName = state.projects.find { it.id == app.firebaseProjectId }?.name ?: "Default",
-                            onClick = { onAppClick(app.id) }
+                            onClick = { onAppClick(app.id) },
+                            onEdit = { onEditAppClick(app.id) },
+                            onDelete = { appToDelete = app }
                         )
                     }
                 }
             }
         }
+    }
+
+    appToDelete?.let { app ->
+        SNotificationConfirmDialog(
+            title = stringResource(R.string.dialog_delete_title),
+            icon = Icons.Default.Delete,
+            message = stringResource(R.string.dialog_delete_msg, app.name),
+            isDestructive = true,
+            confirmText = stringResource(R.string.btn_delete),
+            onConfirm = {
+                viewModel.deleteApp(app.id) {
+                    ToastManager.show(context, R.string.msg_item_deleted)
+                    appToDelete = null
+                }
+            },
+            onDismiss = { appToDelete = null }
+        )
     }
 }
 
@@ -180,7 +233,9 @@ fun AppsScreen(
 private fun AppCardItem(
     app: AppModel,
     projectName: String,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    onEdit: () -> Unit,
+    onDelete: () -> Unit
 ) {
     OutlinedCard(
         onClick = onClick,
@@ -201,9 +256,30 @@ private fun AppCardItem(
                     text = app.name,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold,
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = MaterialTheme.colorScheme.onSurface,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f)
                 )
+                Spacer(modifier = Modifier.width(8.dp))
                 EnvironmentBadge(environment = app.environment)
+                Spacer(modifier = Modifier.width(4.dp))
+                IconButton(onClick = onEdit, modifier = Modifier.size(32.dp)) {
+                    Icon(
+                        imageVector = Icons.Default.Edit,
+                        contentDescription = stringResource(R.string.btn_edit),
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(18.dp)
+                    )
+                }
+                IconButton(onClick = onDelete, modifier = Modifier.size(32.dp)) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = stringResource(R.string.btn_delete),
+                        tint = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.size(18.dp)
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.height(6.dp))
@@ -211,7 +287,9 @@ private fun AppCardItem(
             Text(
                 text = app.packageName,
                 style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -223,13 +301,18 @@ private fun AppCardItem(
                 Text(
                     text = "Firebase: $projectName",
                     style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.primary
+                    color = MaterialTheme.colorScheme.primary,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f)
                 )
                 val topicDisplay = if (app.defaultTopic.isNotBlank()) app.defaultTopic else "None"
                 Text(
                     text = "Default topic: $topicDisplay",
                     style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
         }

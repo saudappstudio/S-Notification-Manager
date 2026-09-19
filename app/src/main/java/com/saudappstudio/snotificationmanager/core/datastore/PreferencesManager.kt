@@ -1,4 +1,4 @@
-﻿package com.saudappstudio.snotificationmanager.core.datastore
+package com.saudappstudio.snotificationmanager.core.datastore
 
 import android.content.Context
 import androidx.datastore.core.DataStore
@@ -30,10 +30,13 @@ class PreferencesManager(private val context: Context) {
         val TEST_MODE_ONLY = booleanPreferencesKey("test_mode_only")
         val CONFIRM_BEFORE_PROD_SEND = booleanPreferencesKey("confirm_before_prod_send")
         val REQUIRE_BIOMETRIC_FOR_PROD = booleanPreferencesKey("require_biometric_for_prod")
+        val REQUIRE_BIOMETRIC_ON_APP_OPEN = booleanPreferencesKey("require_biometric_on_app_open")
         val DEFAULT_PRIORITY = stringPreferencesKey("default_priority")
         val DEFAULT_CHANNEL_ID = stringPreferencesKey("default_channel_id")
         val LAST_CHECKED_TIMESTAMP = longPreferencesKey("last_checked_timestamp")
         val LAST_BACKEND_STATUS = stringPreferencesKey("last_backend_status")
+        val CLOUDINARY_CLOUD_NAME = stringPreferencesKey("cloudinary_cloud_name")
+        val CLOUDINARY_UPLOAD_PRESET = stringPreferencesKey("cloudinary_upload_preset")
     }
 
     /**
@@ -51,16 +54,21 @@ class PreferencesManager(private val context: Context) {
         .map { preferences ->
             UserPreferences(
                 themeMode = preferences[PreferencesKeys.THEME_MODE] ?: "SYSTEM",
-                backendUrl = preferences[PreferencesKeys.BACKEND_URL] ?: "https://your-site.netlify.app/.netlify/functions",
+                backendUrl = preferences[PreferencesKeys.BACKEND_URL]?.takeIf { 
+                    it.isNotBlank() && !it.contains("your-site.netlify.app") 
+                } ?: "https://saudnotificationmanager.netlify.app/.netlify/functions",
                 apiToken = preferences[PreferencesKeys.API_TOKEN] ?: "",
                 lastSelectedAppId = preferences[PreferencesKeys.LAST_SELECTED_APP_ID] ?: "",
                 testModeOnly = preferences[PreferencesKeys.TEST_MODE_ONLY] ?: false,
                 confirmBeforeProdSend = preferences[PreferencesKeys.CONFIRM_BEFORE_PROD_SEND] ?: true,
                 requireBiometricForProd = preferences[PreferencesKeys.REQUIRE_BIOMETRIC_FOR_PROD] ?: false,
+                requireBiometricOnAppOpen = preferences[PreferencesKeys.REQUIRE_BIOMETRIC_ON_APP_OPEN] ?: false,
                 defaultPriority = preferences[PreferencesKeys.DEFAULT_PRIORITY] ?: "HIGH",
                 defaultChannelId = preferences[PreferencesKeys.DEFAULT_CHANNEL_ID] ?: "general_notifications",
                 lastCheckedTimestamp = preferences[PreferencesKeys.LAST_CHECKED_TIMESTAMP] ?: 0L,
-                lastBackendStatus = preferences[PreferencesKeys.LAST_BACKEND_STATUS] ?: "DISCONNECTED"
+                lastBackendStatus = preferences[PreferencesKeys.LAST_BACKEND_STATUS] ?: "DISCONNECTED",
+                cloudinaryCloudName = preferences[PreferencesKeys.CLOUDINARY_CLOUD_NAME] ?: "dvyx3z9vp",
+                cloudinaryUploadPreset = preferences[PreferencesKeys.CLOUDINARY_UPLOAD_PRESET] ?: "saud_preset"
             )
         }
 
@@ -142,6 +150,17 @@ class PreferencesManager(private val context: Context) {
     }
 
     /**
+     * Toggles biometric lock required upon opening application.
+     *
+     * @param required True if biometric app lock is active.
+     */
+    suspend fun setRequireBiometricOnAppOpen(required: Boolean) {
+        context.dataStore.edit { preferences ->
+            preferences[PreferencesKeys.REQUIRE_BIOMETRIC_ON_APP_OPEN] = required
+        }
+    }
+
+    /**
      * Updates default notification channel and priority.
      *
      * @param channelId Default channel name.
@@ -164,6 +183,19 @@ class PreferencesManager(private val context: Context) {
         context.dataStore.edit { preferences ->
             preferences[PreferencesKeys.LAST_CHECKED_TIMESTAMP] = timestamp
             preferences[PreferencesKeys.LAST_BACKEND_STATUS] = status
+        }
+    }
+
+    /**
+     * Updates Cloudinary cloud name and upload preset settings.
+     *
+     * @param cloudName Cloudinary cloud name.
+     * @param uploadPreset Cloudinary unsigned upload preset.
+     */
+    suspend fun setCloudinaryConfig(cloudName: String, uploadPreset: String) {
+        context.dataStore.edit { preferences ->
+            preferences[PreferencesKeys.CLOUDINARY_CLOUD_NAME] = cloudName
+            preferences[PreferencesKeys.CLOUDINARY_UPLOAD_PRESET] = uploadPreset
         }
     }
 

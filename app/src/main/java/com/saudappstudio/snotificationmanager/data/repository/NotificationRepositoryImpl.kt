@@ -1,4 +1,4 @@
-﻿package com.saudappstudio.snotificationmanager.data.repository
+package com.saudappstudio.snotificationmanager.data.repository
 
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -14,6 +14,7 @@ import com.saudappstudio.snotificationmanager.domain.model.TargetType
 import com.saudappstudio.snotificationmanager.domain.repository.NotificationRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import java.util.UUID
 
 /**
  * Concrete implementation of NotificationRepository coordinating Room persistence and Netlify API communication.
@@ -26,49 +27,19 @@ class NotificationRepositoryImpl(
 
     override fun getAllHistory(): Flow<List<NotificationHistoryModel>> {
         return notificationHistoryDao.getAllHistory().map { list ->
-            list.map { entity ->
-                NotificationHistoryModel(
-                    id = entity.id,
-                    appId = entity.appId,
-                    appName = entity.appName,
-                    title = entity.title,
-                    message = entity.message,
-                    targetType = TargetType.fromKey(entity.targetType),
-                    target = entity.target,
-                    environment = Environment.fromKey(entity.environment),
-                    status = entity.status,
-                    messageId = entity.messageId,
-                    error = entity.error,
-                    imageUrl = entity.imageUrl,
-                    clickAction = entity.clickAction,
-                    deepLink = entity.deepLink,
-                    customData = parseCustomData(entity.customDataJson),
-                    sentAt = entity.sentAt
-                )
-            }
+            list.map { entityToModel(it) }
+        }
+    }
+
+    override fun getHistoryByApp(appId: String): Flow<List<NotificationHistoryModel>> {
+        return notificationHistoryDao.getHistoryByApp(appId).map { list ->
+            list.map { entityToModel(it) }
         }
     }
 
     override suspend fun getHistoryById(id: String): NotificationHistoryModel? {
         val entity = notificationHistoryDao.getHistoryById(id) ?: return null
-        return NotificationHistoryModel(
-            id = entity.id,
-            appId = entity.appId,
-            appName = entity.appName,
-            title = entity.title,
-            message = entity.message,
-            targetType = TargetType.fromKey(entity.targetType),
-            target = entity.target,
-            environment = Environment.fromKey(entity.environment),
-            status = entity.status,
-            messageId = entity.messageId,
-            error = entity.error,
-            imageUrl = entity.imageUrl,
-            clickAction = entity.clickAction,
-            deepLink = entity.deepLink,
-            customData = parseCustomData(entity.customDataJson),
-            sentAt = entity.sentAt
-        )
+        return entityToModel(entity)
     }
 
     override suspend fun insertHistory(history: NotificationHistoryModel) {
@@ -87,6 +58,10 @@ class NotificationRepositoryImpl(
             imageUrl = history.imageUrl,
             clickAction = history.clickAction,
             deepLink = history.deepLink,
+            notificationType = history.notificationType,
+            eventTrigger = history.eventTrigger,
+            isScheduled = history.isScheduled,
+            scheduledTimestamp = history.scheduledTimestamp,
             customDataJson = gson.toJson(history.customData),
             sentAt = history.sentAt
         )
@@ -104,22 +79,66 @@ class NotificationRepositoryImpl(
             if (response.isSuccessful) {
                 val body = response.body()
                 if (body != null && body.success) {
-                    Result.success(body.messageId ?: "success")
+                    val msgId = body.messageId ?: "success"
+                    Logger.i("Notification Sent Successfully: messageId=$msgId")
+                    Result.success(msgId)
                 } else {
-                    Result.failure(Exception(body?.error ?: "Backend returned unsuccessful response"))
+                    val err = body?.error ?: "Backend returned unsuccessful response"
+                    Logger.e("Send Notification API Error: $err")
+                    Result.failure(Exception(err))
                 }
             } else {
+                val rawErrorBody = response.errorBody()?.string() ?: response.message()
                 val errorMsg = when (response.code()) {
-                    401 -> "Unauthorized: Check API authentication token in Settings"
-                    403 -> "Forbidden: You do not have permission to send this notification"
-                    404 -> "Not Found: Netlify function endpoint not found"
-                    500 -> "Internal Server Error: Backend Firebase Admin SDK execution failure"
-                    else -> "HTTP : "
+                    401 -> "Unauthorized (401): Check API authentication token in Settings"
+                    403 -> "Forbidden (403): You do not have permission to send this notification"
+                    404 -> "Not Found (404): Netlify function endpoint not found"
+                    500 -> "Internal Server Error (500): Firebase Admin execution failure - $rawErrorBody"
+                    else -> "HTTP ${response.code()}: $rawErrorBody"
                 }
+                Logger.e("Send Notification HTTP ${response.code()} Failure: $errorMsg")
                 Result.failure(Exception(errorMsg))
             }
         } catch (e: Exception) {
-            Logger.e("Send notification network error", e)
+            Logger.e("Send notification network exception: ${e.localizedMessage}", e)
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun scheduleNotification(appName: String, payload: NotificationPayload): Result<String> {
+        return try {
+            val scheduledTime = payload.scheduledTimestamp ?: (System.currentTimeMillis() + payload.scheduleDelayMinutes * 60 * 1000L)
+            val scheduleId = "sched_${UUID.randomUUID().toString().take(8)}"
+
+            // Log scheduled record to history
+            val historyRecord = NotificationHistoryModel(
+                id = UUID.randomUUID().toString(),
+                appId = payload.appId,
+                appName = appName,
+                title = payload.title,
+                message = payload.message,
+                targetType = payload.targetType,
+                target = payload.target,
+                environment = payload.environment,
+                status = "SCHEDULED",
+                messageId = scheduleId,
+                error = null,
+                imageUrl = payload.imageUrl,
+                clickAction = payload.clickAction,
+                deepLink = payload.deepLink,
+                notificationType = payload.notificationType,
+                eventTrigger = payload.eventTrigger,
+                isScheduled = true,
+                scheduledTimestamp = scheduledTime,
+                customData = payload.customData,
+                sentAt = scheduledTime
+            )
+            insertHistory(historyRecord)
+
+            Logger.i("Notification scheduled successfully for $appName at timestamp $scheduledTime")
+            Result.success(scheduleId)
+        } catch (e: Exception) {
+            Logger.e("Failed to schedule notification: ${e.localizedMessage}", e)
             Result.failure(e)
         }
     }
@@ -129,14 +148,43 @@ class NotificationRepositoryImpl(
         return try {
             val response = apiService.sendTestNotification(dto)
             if (response.isSuccessful && response.body()?.success == true) {
-                Result.success(response.body()?.messageId ?: "test-success")
+                val msgId = response.body()?.messageId ?: "test-success"
+                Logger.i("Test Notification Sent Successfully: messageId=$msgId")
+                Result.success(msgId)
             } else {
-                Result.failure(Exception(response.body()?.error ?: "Test send failed (HTTP )"))
+                val rawError = response.errorBody()?.string() ?: response.body()?.error ?: "HTTP ${response.code()}"
+                Logger.e("Test Notification Failed: $rawError")
+                Result.failure(Exception(rawError))
             }
         } catch (e: Exception) {
-            Logger.e("Send test notification network error", e)
+            Logger.e("Send test notification network exception: ${e.localizedMessage}", e)
             Result.failure(e)
         }
+    }
+
+    private fun entityToModel(entity: NotificationHistoryEntity): NotificationHistoryModel {
+        return NotificationHistoryModel(
+            id = entity.id,
+            appId = entity.appId,
+            appName = entity.appName,
+            title = entity.title,
+            message = entity.message,
+            targetType = TargetType.fromKey(entity.targetType),
+            target = entity.target,
+            environment = Environment.fromKey(entity.environment),
+            status = entity.status,
+            messageId = entity.messageId,
+            error = entity.error,
+            imageUrl = entity.imageUrl,
+            clickAction = entity.clickAction,
+            deepLink = entity.deepLink,
+            notificationType = entity.notificationType,
+            eventTrigger = entity.eventTrigger,
+            isScheduled = entity.isScheduled,
+            scheduledTimestamp = entity.scheduledTimestamp,
+            customData = parseCustomData(entity.customDataJson),
+            sentAt = entity.sentAt
+        )
     }
 
     private fun mapToDto(payload: NotificationPayload): NotificationRequestDto {
@@ -156,6 +204,10 @@ class NotificationRepositoryImpl(
             ttl = payload.ttl,
             collapseKey = payload.collapseKey.ifBlank { null },
             badge = payload.badge,
+            notificationType = payload.notificationType,
+            eventTrigger = payload.eventTrigger.ifBlank { null },
+            isScheduled = payload.isScheduled,
+            scheduledTimestamp = payload.scheduledTimestamp,
             customData = payload.customData.ifEmpty { null }
         )
     }

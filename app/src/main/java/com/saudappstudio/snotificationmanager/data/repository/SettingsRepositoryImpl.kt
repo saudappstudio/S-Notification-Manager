@@ -1,4 +1,4 @@
-﻿package com.saudappstudio.snotificationmanager.data.repository
+package com.saudappstudio.snotificationmanager.data.repository
 
 import com.saudappstudio.snotificationmanager.core.datastore.PreferencesManager
 import com.saudappstudio.snotificationmanager.core.datastore.UserPreferences
@@ -62,6 +62,10 @@ class SettingsRepositoryImpl(
         preferencesManager.setRequireBiometricForProd(required)
     }
 
+    override suspend fun setRequireBiometricOnAppOpen(required: Boolean) {
+        preferencesManager.setRequireBiometricOnAppOpen(required)
+    }
+
     override suspend fun setDefaultNotificationSettings(channelId: String, priority: String) {
         preferencesManager.setDefaultNotificationSettings(channelId, priority)
     }
@@ -78,13 +82,16 @@ class SettingsRepositoryImpl(
                     message = body?.status ?: "OK"
                 )
                 preferencesManager.setBackendHealthStatus(model.timestamp, "CONNECTED")
+                Logger.i("Backend Connected Successfully: status=${body?.status}, version=${body?.version}")
                 Result.success(model)
             } else {
+                val errorMsg = response.errorBody()?.string() ?: response.message()
+                Logger.e("Backend Health Check Failed - HTTP ${response.code()}: $errorMsg")
                 preferencesManager.setBackendHealthStatus(System.currentTimeMillis(), "DISCONNECTED")
-                Result.failure(Exception("HTTP : "))
+                Result.failure(Exception("HTTP ${response.code()}: $errorMsg"))
             }
         } catch (e: Exception) {
-            Logger.e("Backend health check failed", e)
+            Logger.e("Backend health check network error: ${e.localizedMessage}", e)
             preferencesManager.setBackendHealthStatus(System.currentTimeMillis(), "DISCONNECTED")
             Result.failure(e)
         }

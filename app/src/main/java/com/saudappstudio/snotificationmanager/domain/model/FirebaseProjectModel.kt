@@ -1,4 +1,4 @@
-﻿package com.saudappstudio.snotificationmanager.domain.model
+package com.saudappstudio.snotificationmanager.domain.model
 
 /**
  * Domain model representing a Firebase project identifier configuration.
@@ -10,5 +10,6 @@ data class FirebaseProjectModel(
     val projectIdentifier: String,
     val environment: Environment = Environment.PRODUCTION,
     val backendKey: String,
+    val gaPropertyId: String = "",
     val enabled: Boolean = true
 )

@@ -1,4 +1,4 @@
-﻿package com.saudappstudio.snotificationmanager.presentation.templates
+package com.saudappstudio.snotificationmanager.presentation.templates
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -36,10 +36,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.saudappstudio.snotificationmanager.R
 import com.saudappstudio.snotificationmanager.core.ui.ToastManager
 import com.saudappstudio.snotificationmanager.domain.model.TemplateModel
+import com.saudappstudio.snotificationmanager.presentation.components.ImagePickerUploadField
 import com.saudappstudio.snotificationmanager.presentation.components.KeyValueEditor
 import com.saudappstudio.snotificationmanager.presentation.components.VariableChipSelector
 import com.saudappstudio.snotificationmanager.provider.ActionTypeOptionsProvider
@@ -169,14 +171,12 @@ fun CreateTemplateScreen(
                 shape = RoundedCornerShape(12.dp)
             )
 
-            OutlinedTextField(
-                value = imageUrl,
-                onValueChange = { imageUrl = it },
-                label = { Text(stringResource(R.string.field_image_url)) },
-                placeholder = { Text("https://example.com/banner.png") },
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true,
-                shape = RoundedCornerShape(12.dp)
+            ImagePickerUploadField(
+                imageUrl = imageUrl,
+                onUrlChange = { imageUrl = it },
+                cloudinaryRepository = viewModel.cloudinaryRepository,
+                cloudName = state.userPreferences.cloudinaryCloudName,
+                uploadPreset = state.userPreferences.cloudinaryUploadPreset
             )
 
             OutlinedTextField(
@@ -270,7 +270,12 @@ fun CreateTemplateScreen(
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(12.dp)
                 ) {
-                    Text(stringResource(R.string.btn_save))
+                    Text(
+                        text = stringResource(R.string.btn_save),
+                        maxLines = 1,
+                        softWrap = false,
+                        overflow = TextOverflow.Ellipsis
+                    )
                 }
 
                 Button(
@@ -298,7 +303,12 @@ fun CreateTemplateScreen(
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(12.dp)
                 ) {
-                    Text(stringResource(R.string.btn_save_and_send))
+                    Text(
+                        text = stringResource(R.string.btn_save_and_send),
+                        maxLines = 1,
+                        softWrap = false,
+                        overflow = TextOverflow.Ellipsis
+                    )
                 }
             }
 

@@ -1,8 +1,9 @@
-﻿package com.saudappstudio.snotificationmanager.core.di
+package com.saudappstudio.snotificationmanager.core.di
 
 import android.content.Context
 import com.saudappstudio.snotificationmanager.BuildConfig
 import com.saudappstudio.snotificationmanager.core.datastore.PreferencesManager
+import com.saudappstudio.snotificationmanager.core.logging.Logger
 import com.saudappstudio.snotificationmanager.core.security.BiometricAuthManager
 import com.saudappstudio.snotificationmanager.data.remote.api.AuthInterceptor
 import com.saudappstudio.snotificationmanager.data.remote.api.NetlifyApiService
@@ -54,8 +55,10 @@ object NetworkModule {
             .addInterceptor(authInterceptor)
 
         if (BuildConfig.DEBUG) {
-            val logging = HttpLoggingInterceptor().apply {
-                level = HttpLoggingInterceptor.Level.BASIC
+            val logging = HttpLoggingInterceptor { message ->
+                Logger.d(message, "NetworkRequest")
+            }.apply {
+                level = HttpLoggingInterceptor.Level.BODY
             }
             builder.addInterceptor(logging)
         }
@@ -82,5 +85,18 @@ object NetworkModule {
             .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(NetlifyApiService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideCloudinaryApiService(
+        okHttpClient: OkHttpClient
+    ): com.saudappstudio.snotificationmanager.data.remote.api.CloudinaryApiService {
+        return Retrofit.Builder()
+            .baseUrl("https://api.cloudinary.com/")
+            .client(okHttpClient)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+            .create(com.saudappstudio.snotificationmanager.data.remote.api.CloudinaryApiService::class.java)
     }
 }

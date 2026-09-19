@@ -1,4 +1,4 @@
-﻿package com.saudappstudio.snotificationmanager.presentation.home
+package com.saudappstudio.snotificationmanager.presentation.home
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -44,6 +44,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.saudappstudio.snotificationmanager.R
 import com.saudappstudio.snotificationmanager.domain.model.AppModel
@@ -116,30 +117,12 @@ fun HomeScreen(
                 .padding(paddingValues)
                 .padding(horizontal = 16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
-            contentPadding = PaddingValues(vertical = 12.dp)
+            contentPadding = PaddingValues(top = 12.dp, bottom = 16.dp)
         ) {
             // Safety Test Mode Banner if active
             if (state.userPreferences.testModeOnly) {
                 item {
                     TestModeBanner()
-                }
-            }
-
-            // Header Greeting
-            item {
-                Column {
-                    Text(
-                        text = stringResource(R.string.home_greeting),
-                        style = MaterialTheme.typography.headlineMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = stringResource(R.string.home_subtitle),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
                 }
             }
 
@@ -220,10 +203,6 @@ fun HomeScreen(
                     item = item,
                     onClick = { onNotificationClick(item.id) }
                 )
-            }
-
-            item {
-                Spacer(modifier = Modifier.height(72.dp))
             }
         }
     }
@@ -324,17 +303,24 @@ private fun QuickActionsGrid(
                                 )
                             }
                             Spacer(modifier = Modifier.width(10.dp))
-                            Column {
+
+                            Column(modifier = Modifier.weight(1f)) {
                                 Text(
                                     text = stringResource(action.titleRes),
                                     style = MaterialTheme.typography.titleSmall,
                                     fontWeight = FontWeight.SemiBold,
-                                    color = MaterialTheme.colorScheme.onSurface
+                                    color = MaterialTheme.colorScheme.onSurface,
+                                    maxLines = 1,
+                                    softWrap = false,
+                                    overflow = TextOverflow.Ellipsis
                                 )
                                 Text(
                                     text = stringResource(action.descriptionRes),
                                     style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    maxLines = 1,
+                                    softWrap = false,
+                                    overflow = TextOverflow.Ellipsis
                                 )
                             }
                         }

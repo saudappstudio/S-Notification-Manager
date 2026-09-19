@@ -1,4 +1,4 @@
-﻿const admin = require("firebase-admin");
+const admin = require("firebase-admin");
 
 /**
  * Initializes or retrieves a named Firebase Admin app instance based on backendKey.
@@ -65,6 +65,8 @@ exports.handler = async (event, context) => {
       deepLink,
       channelId,
       priority = "HIGH",
+      notificationType = "PUSH",
+      eventTrigger = "timer_1_min",
       customData = {}
     } = payload;
 
@@ -78,27 +80,38 @@ exports.handler = async (event, context) => {
     const firebaseApp = getFirebaseApp(backendKey);
     const messaging = firebaseApp.messaging();
 
+    const isFiam = notificationType === "IN_APP";
+
     // Prepare FCM message payload
     const fcmMessage = {
-      notification: {
-        title: title,
-        body: message,
-        ...(imageUrl ? { imageUrl: imageUrl } : {})
-      },
       data: {
+        notification_type: notificationType,
+        event_trigger: eventTrigger,
         clickAction: clickAction || "OPEN_APP",
         deepLink: deepLink || "",
+        title: title,
+        body: message,
+        ...(imageUrl ? { imageUrl: imageUrl } : {}),
         ...customData
       },
       android: {
-        priority: priority.toLowerCase() === "high" ? "high" : "normal",
-        notification: {
-          channelId: channelId || "general_notifications",
-          sound: "default",
-          ...(imageUrl ? { imageUrl: imageUrl } : {})
-        }
+        priority: priority.toLowerCase() === "high" ? "high" : "normal"
       }
     };
+
+    // Only include top-level system notification block for standard PUSH notifications
+    if (!isFiam) {
+      fcmMessage.notification = {
+        title: title,
+        body: message,
+        ...(imageUrl ? { imageUrl: imageUrl } : {})
+      };
+      fcmMessage.android.notification = {
+        channelId: channelId || "general_notifications",
+        sound: "default",
+        ...(imageUrl ? { imageUrl: imageUrl } : {})
+      };
+    }
 
     if (targetType === "TOPIC") {
       fcmMessage.topic = target;
