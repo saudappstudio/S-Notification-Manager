@@ -15,6 +15,12 @@ class AuthInterceptor(
 
     override fun intercept(chain: Interceptor.Chain): Response {
         val originalRequest = chain.request()
+
+        // Do not attach app Auth token or JSON content-type to external APIs such as Cloudinary
+        if (originalRequest.url.host.contains("cloudinary.com")) {
+            return chain.proceed(originalRequest)
+        }
+
         val userPrefs = runBlocking { preferencesManager.userPreferencesFlow.first() }
         val token = userPrefs.apiToken
 
